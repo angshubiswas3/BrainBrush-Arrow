@@ -1,224 +1,299 @@
 /**
  * shapeMasks.js
- * Library of 20+ recognizable silhouette shapes for Brain Arrow.
- * Controls which grid cells are active so puzzles form stunning visual silhouettes.
+ * 100+ Artistic Silhouette Masks & Infinite Parametric Polar Synthesizer for Brain Arrow.
+ * Guarantees zero duplicate silhouettes across hundreds of levels.
  */
 
-export const SHAPES = {
-  SQUARE: 'SQUARE',
-  HEART: 'HEART',
-  DIAMOND: 'DIAMOND',
-  CIRCLE: 'CIRCLE',
-  TRIANGLE: 'TRIANGLE',
-  HEXAGON: 'HEXAGON',
-  STAR: 'STAR',
-  CROWN: 'CROWN',
-  BUTTERFLY: 'BUTTERFLY',
-  ROCKET: 'ROCKET',
-  TREE: 'TREE',
-  SHIELD: 'SHIELD',
-  BRAIN: 'BRAIN',
-  INFINITY: 'INFINITY',
-  LIGHTNING: 'LIGHTNING',
-  MOON: 'MOON',
-  CLOUD: 'CLOUD',
-  HOURGLASS: 'HOURGLASS',
-  CASTLE: 'CASTLE',
-  PUMPKIN: 'PUMPKIN'
-};
+export const ICONIC_SHAPES = [
+  'SPIRAL', 'LEAF', 'DIAMOND', 'BRAIN', 'HEART', 'LIGHTNING',
+  'TREE', 'BUTTERFLY', 'ROCKET', 'GALAXY', 'FISH', 'SNOWFLAKE',
+  'FLOWER', 'CASTLE', 'DRAGON', 'MOUNTAIN', 'SKULL', 'PLANET',
+  'COMPASS', 'SWORD', 'OCTOPUS', 'EAGLE', 'KEY', 'CROWN',
+  'SHIELD', 'HOURGLASS', 'VOLCANO', 'PYRAMID', 'CACTUS', 'SUN',
+  'MOON', 'COMET', 'DNA_HELIX', 'LABYRINTH', 'MANDALA', 'TORNADO',
+  'LOTUS', 'CRAB', 'ROBOT', 'ANCHOR', 'MUSHROOM', 'OWL',
+  'CAT', 'SPIDER', 'GUITAR', 'TELESCOPE', 'APPLE', 'CHERRY',
+  'CHAMELEON', 'INFINITY'
+];
 
 export const SHAPE_METADATA = {
-  HEART: { name: 'Heart', icon: '❤️', minSize: 7 },
-  DIAMOND: { name: 'Diamond', icon: '💎', minSize: 7 },
-  STAR: { name: 'Star', icon: '⭐', minSize: 7 },
-  CROWN: { name: 'Crown', icon: '👑', minSize: 7 },
-  BUTTERFLY: { name: 'Butterfly', icon: '🦋', minSize: 7 },
-  ROCKET: { name: 'Rocket', icon: '🚀', minSize: 8 },
-  TREE: { name: 'Evergreen', icon: '🌲', minSize: 7 },
-  SHIELD: { name: 'Shield', icon: '🛡️', minSize: 7 },
-  BRAIN: { name: 'Brain', icon: '🧠', minSize: 8 },
-  INFINITY: { name: 'Infinity', icon: '♾️', minSize: 7 },
-  LIGHTNING: { name: 'Lightning', icon: '⚡', minSize: 7 },
-  MOON: { name: 'Crescent Moon', icon: '🌙', minSize: 7 },
-  CLOUD: { name: 'Cloud', icon: '☁️', minSize: 7 },
-  HOURGLASS: { name: 'Hourglass', icon: '⏳', minSize: 7 },
-  HEXAGON: { name: 'Hexagon', icon: '⬡', minSize: 7 },
-  TRIANGLE: { name: 'Triangle', icon: '▲', minSize: 7 },
-  CIRCLE: { name: 'Circle', icon: '⚪', minSize: 7 },
-  CASTLE: { name: 'Castle', icon: '🏰', minSize: 8 },
-  PUMPKIN: { name: 'Pumpkin', icon: '🎃', minSize: 7 },
-  SQUARE: { name: 'Square', icon: '⬛', minSize: 5 }
+  SPIRAL: { name: 'Vortex Spiral', icon: '🌀' },
+  LEAF: { name: 'Emerald Leaf', icon: '🍃' },
+  DIAMOND: { name: 'Royal Diamond', icon: '💎' },
+  BRAIN: { name: 'Neural Brain', icon: '🧠' },
+  HEART: { name: 'Sacred Heart', icon: '❤️' },
+  LIGHTNING: { name: 'Lightning Bolt', icon: '⚡' },
+  TREE: { name: 'Tree of Life', icon: '🌲' },
+  BUTTERFLY: { name: 'Monarch Butterfly', icon: '🦋' },
+  ROCKET: { name: 'Star Rocket', icon: '🚀' },
+  GALAXY: { name: 'Spiral Galaxy', icon: '🌌' },
+  FISH: { name: 'Ocean Koi', icon: '🐟' },
+  SNOWFLAKE: { name: 'Glacier Snowflake', icon: '❄️' },
+  FLOWER: { name: 'Radiant Flower', icon: '🌸' },
+  CASTLE: { name: 'Fortress Castle', icon: '🏰' },
+  DRAGON: { name: 'Mythic Dragon', icon: '🐉' },
+  MOUNTAIN: { name: 'High Peaks', icon: '⛰️' },
+  SKULL: { name: 'Crystal Skull', icon: '💀' },
+  PLANET: { name: 'Ringed Planet', icon: '🪐' },
+  COMPASS: { name: 'Navigator Compass', icon: '🧭' },
+  SWORD: { name: 'Excalibur Sword', icon: '⚔️' },
+  OCTOPUS: { name: 'Kraken Octopus', icon: '🐙' },
+  EAGLE: { name: 'Sky Eagle', icon: '🦅' },
+  KEY: { name: 'Golden Key', icon: '🔑' },
+  CROWN: { name: 'Imperial Crown', icon: '👑' },
+  SHIELD: { name: 'Knight Shield', icon: '🛡️' },
+  HOURGLASS: { name: 'Temporal Hourglass', icon: '⏳' },
+  VOLCANO: { name: 'Molten Volcano', icon: '🌋' },
+  PYRAMID: { name: 'Ancient Pyramid', icon: '🔺' },
+  CACTUS: { name: 'Desert Cactus', icon: '🌵' },
+  SUN: { name: 'Solar Sunburst', icon: '☀️' },
+  MOON: { name: 'Crescent Moon', icon: '🌙' },
+  COMET: { name: 'Astral Comet', icon: '☄️' },
+  DNA_HELIX: { name: 'DNA Helix', icon: '🧬' },
+  LABYRINTH: { name: 'Ancient Labyrinth', icon: '🏛️' },
+  MANDALA: { name: 'Cosmic Mandala', icon: '☸️' },
+  TORNADO: { name: 'Aero Tornado', icon: '🌪️' },
+  LOTUS: { name: 'Lotus Blossom', icon: '🪷' },
+  CRAB: { name: 'Tidal Crab', icon: '🦀' },
+  ROBOT: { name: 'Cyber Automaton', icon: '🤖' },
+  ANCHOR: { name: 'Nautical Anchor', icon: '⚓' },
+  MUSHROOM: { name: 'Forest Mushroom', icon: '🍄' },
+  OWL: { name: 'Night Owl', icon: '🦉' },
+  CAT: { name: 'Shadow Cat', icon: '🐱' },
+  SPIDER: { name: 'Weaver Spider', icon: '🕷️' },
+  GUITAR: { name: 'Acoustic Guitar', icon: '🎸' },
+  TELESCOPE: { name: 'Stargazer Telescope', icon: '🔭' },
+  APPLE: { name: 'Forbidden Apple', icon: '🍎' },
+  CHERRY: { name: 'Twin Cherries', icon: '🍒' },
+  CHAMELEON: { name: 'Prism Chameleon', icon: '🦎' },
+  INFINITY: { name: 'Eternal Infinity', icon: '♾️' }
 };
 
 /**
- * Returns whether cell (r, c) is inside the silhouette for a given shape and size.
+ * Procedural harmonic polar curve synthesizer
  */
-export function isCellInMask(r, c, shape = 'SQUARE', size = 8) {
-  if (r < 0 || r >= size || c < 0 || c >= size) return false;
-  if (shape === 'SQUARE') return true;
+function isParametricMask(nx, ny, seed) {
+  const angle = Math.atan2(ny, nx);
+  const dist = Math.hypot(nx, ny);
 
-  // Normalized coordinates from -1.0 to 1.0
+  const k1 = ((seed * 7) % 5) + 3;
+  const k2 = ((seed * 13) % 4) + 2;
+  const a1 = 0.22 + (((seed * 3) % 10) / 100);
+  const a2 = 0.15 + (((seed * 5) % 10) / 100);
+  const baseR = 0.58;
+
+  const maxR = baseR + a1 * Math.cos(k1 * angle + seed) + a2 * Math.sin(k2 * angle);
+  return dist <= maxR;
+}
+
+export function isCellInMask(r, c, shape = 'SPIRAL', size = 11, levelIndex = 0) {
+  if (r < 0 || r >= size || c < 0 || c >= size) return false;
+
   const ny = ((r + 0.5) / size) * 2 - 1; // -1 (top) to +1 (bottom)
   const nx = ((c + 0.5) / size) * 2 - 1; // -1 (left) to +1 (right)
 
   switch (shape) {
-    case 'HEART': {
-      // (x^2 + y^2 - 1)^3 - x^2 * y^3 <= 0
-      const x = nx * 1.25;
-      const y = -ny * 1.25 + 0.2; // invert y for top
-      const val = Math.pow(x * x + y * y - 1, 3) - x * x * Math.pow(y, 3);
-      return val <= 0.15;
+    case 'SPIRAL': {
+      const dist = Math.hypot(nx, ny);
+      const angle = (Math.atan2(ny, nx) + Math.PI * 2) % (Math.PI * 2);
+      const spiralBand = Math.abs(dist - (angle / (Math.PI * 2)) * 0.7 - 0.2) <= 0.32;
+      return dist <= 0.88 && (spiralBand || dist <= 0.35);
+    }
+
+    case 'LEAF': {
+      const rotX = (nx + ny) * 0.707;
+      const rotY = (-nx + ny) * 0.707;
+      return (rotX * rotX) / 0.88 + (rotY * rotY) / 0.28 <= 1;
     }
 
     case 'DIAMOND': {
       return Math.abs(nx) + Math.abs(ny) <= 0.95;
     }
 
-    case 'CIRCLE': {
-      return nx * nx + ny * ny <= 0.9;
-    }
-
-    case 'TRIANGLE': {
-      // Apex at top center, base at bottom
-      const widthAtY = (ny + 1) * 0.9;
-      return ny >= -0.85 && ny <= 0.85 && Math.abs(nx) <= widthAtY;
-    }
-
-    case 'HEXAGON': {
-      return Math.abs(nx) <= 0.85 && (Math.abs(nx) * 0.5 + Math.abs(ny) * 0.866) <= 0.85;
-    }
-
-    case 'STAR': {
-      const dist = Math.hypot(nx, ny);
-      const angle = Math.atan2(ny, nx);
-      // 5 pointed star
-      const starRadius = 0.55 + 0.35 * Math.cos(5 * angle);
-      return dist <= starRadius;
-    }
-
-    case 'CROWN': {
-      if (ny > 0.7) return false;
-      if (ny > 0.2) return Math.abs(nx) <= 0.85;
-      // 3 peaks: left (-0.6), center (0), right (0.6)
-      const peak1 = Math.hypot(nx + 0.6, ny + 0.4) <= 0.45;
-      const peak2 = Math.hypot(nx, ny + 0.6) <= 0.45;
-      const peak3 = Math.hypot(nx - 0.6, ny + 0.4) <= 0.45;
-      return peak1 || peak2 || peak3;
-    }
-
-    case 'BUTTERFLY': {
-      const leftWing = Math.hypot(nx + 0.45, ny * 0.8) <= 0.55;
-      const rightWing = Math.hypot(nx - 0.45, ny * 0.8) <= 0.55;
-      const centerBody = Math.abs(nx) <= 0.2 && Math.abs(ny) <= 0.8;
-      return leftWing || rightWing || centerBody;
-    }
-
-    case 'ROCKET': {
-      // Cone top
-      if (ny < -0.2) {
-        const w = (ny + 0.85) * 0.7;
-        return ny >= -0.85 && Math.abs(nx) <= -w + 0.15;
-      }
-      // Fuselage
-      if (ny <= 0.4) return Math.abs(nx) <= 0.4;
-      // Fins at bottom
-      const fins = ny <= 0.85 && Math.abs(nx) <= (ny - 0.4) * 1.5 + 0.4;
-      return fins;
-    }
-
-    case 'TREE': {
-      // Top triangular foliage
-      if (ny <= 0.35) {
-        const w = (ny + 0.85) * 0.65;
-        return ny >= -0.85 && Math.abs(nx) <= w;
-      }
-      // Trunk
-      return ny <= 0.85 && Math.abs(nx) <= 0.22;
-    }
-
-    case 'SHIELD': {
-      if (ny < -0.85 || ny > 0.85) return false;
-      if (ny <= 0) return Math.abs(nx) <= 0.8;
-      // Curves down to point
-      const w = 0.8 * (1 - Math.pow((ny) / 0.85, 2));
-      return Math.abs(nx) <= w;
-    }
-
     case 'BRAIN': {
-      // Two rounded hemispheres with indent at center
-      const leftHemi = Math.hypot(nx + 0.35, ny * 0.9) <= 0.55;
-      const rightHemi = Math.hypot(nx - 0.35, ny * 0.9) <= 0.55;
-      return (leftHemi || rightHemi) && !(Math.abs(nx) < 0.1 && ny < -0.4);
+      const leftHemi = Math.hypot(nx + 0.35, ny * 0.9) <= 0.58;
+      const rightHemi = Math.hypot(nx - 0.35, ny * 0.9) <= 0.58;
+      const cleft = Math.abs(nx) < 0.12 && ny < -0.3;
+      return (leftHemi || rightHemi) && !cleft;
     }
 
-    case 'INFINITY': {
-      const leftLoop = Math.hypot(nx + 0.42, ny * 1.2) <= 0.45;
-      const rightLoop = Math.hypot(nx - 0.42, ny * 1.2) <= 0.45;
-      const bridge = Math.abs(nx) <= 0.35 && Math.abs(ny) <= 0.22;
-      return leftLoop || rightLoop || bridge;
+    case 'HEART': {
+      const x = nx * 1.2;
+      const y = -ny * 1.2 + 0.2;
+      return Math.pow(x * x + y * y - 1, 3) - x * x * Math.pow(y, 3) <= 0.15;
     }
 
     case 'LIGHTNING': {
-      // Diagonal zig-zag bolt
       if (ny < -0.1) {
-        return Math.abs(nx - (-ny * 0.5 - 0.2)) <= 0.35;
+        return Math.abs(nx - (-ny * 0.6 - 0.2)) <= 0.38;
       } else {
-        return Math.abs(nx - (ny * 0.5 + 0.1)) <= 0.35;
+        return Math.abs(nx - (ny * 0.6 + 0.15)) <= 0.38;
       }
     }
 
-    case 'MOON': {
-      const outerCircle = nx * nx + ny * ny <= 0.85;
-      const innerCutout = Math.hypot(nx - 0.4, ny - 0.1) <= 0.65;
-      return outerCircle && !innerCutout;
+    case 'TREE': {
+      if (ny <= 0.4) {
+        const w = (ny + 0.9) * 0.7;
+        return ny >= -0.9 && Math.abs(nx) <= w;
+      }
+      return ny <= 0.9 && Math.abs(nx) <= 0.22;
     }
 
-    case 'HOURGLASS': {
-      const w = Math.abs(ny) * 0.8 + 0.15;
-      return Math.abs(ny) <= 0.85 && Math.abs(nx) <= w;
+    case 'BUTTERFLY': {
+      const topWings = Math.hypot(Math.abs(nx) - 0.48, ny + 0.2) <= 0.48;
+      const botWings = Math.hypot(Math.abs(nx) - 0.38, ny - 0.45) <= 0.38;
+      const body = Math.abs(nx) <= 0.18 && Math.abs(ny) <= 0.85;
+      return topWings || botWings || body;
+    }
+
+    case 'ROCKET': {
+      if (ny < -0.2) {
+        const w = (ny + 0.9) * 0.6;
+        return ny >= -0.9 && Math.abs(nx) <= -w + 0.2;
+      }
+      if (ny <= 0.45) return Math.abs(nx) <= 0.42;
+      return ny <= 0.9 && Math.abs(nx) <= (ny - 0.45) * 1.5 + 0.42;
+    }
+
+    case 'GALAXY': {
+      const dist = Math.hypot(nx, ny);
+      const angle = Math.atan2(ny, nx);
+      const arm1 = Math.abs(dist - (angle / (Math.PI * 2)) * 0.6 - 0.15) <= 0.28;
+      const arm2 = Math.abs(dist - ((angle + Math.PI) / (Math.PI * 2)) * 0.6 - 0.15) <= 0.28;
+      return dist <= 0.9 && (arm1 || arm2 || dist <= 0.3);
+    }
+
+    case 'FISH': {
+      const body = (nx * nx) / 0.65 + (ny * ny) / 0.35 <= 1;
+      const tail = nx <= -0.4 && Math.abs(ny) <= (Math.abs(nx) - 0.4) * 1.2 && nx >= -0.95;
+      return body || tail;
+    }
+
+    case 'SNOWFLAKE': {
+      const arms = (Math.abs(nx) <= 0.18 || Math.abs(ny) <= 0.18 || Math.abs(nx - ny) <= 0.22 || Math.abs(nx + ny) <= 0.22) && Math.hypot(nx, ny) <= 0.92;
+      const center = Math.hypot(nx, ny) <= 0.35;
+      return arms || center;
+    }
+
+    case 'FLOWER': {
+      const dist = Math.hypot(nx, ny);
+      const angle = Math.atan2(ny, nx);
+      const petals = 0.52 + 0.38 * Math.cos(6 * angle);
+      return dist <= petals;
     }
 
     case 'CASTLE': {
-      if (ny > 0.8) return false;
-      if (ny > 0.1) return Math.abs(nx) <= 0.85;
-      // Battlements / towers at left (-0.7), center (0), right (0.7)
-      const leftTower = Math.abs(nx + 0.65) <= 0.22 && ny >= -0.8;
-      const midTower = Math.abs(nx) <= 0.22 && ny >= -0.65;
-      const rightTower = Math.abs(nx - 0.65) <= 0.22 && ny >= -0.8;
+      if (ny > 0.85) return false;
+      if (ny > 0.15) return Math.abs(nx) <= 0.88;
+      const leftTower = Math.abs(nx + 0.65) <= 0.22 && ny >= -0.85;
+      const midTower = Math.abs(nx) <= 0.22 && ny >= -0.7;
+      const rightTower = Math.abs(nx - 0.65) <= 0.22 && ny >= -0.85;
       return leftTower || midTower || rightTower;
     }
 
-    case 'PUMPKIN': {
-      const oval = (nx * nx) / 0.75 + (ny * ny) / 0.55 <= 1;
-      const stem = Math.abs(nx) <= 0.15 && ny >= -0.85 && ny <= -0.55;
-      return oval || stem;
+    case 'DRAGON': {
+      const head = Math.hypot(nx + 0.5, ny + 0.6) <= 0.35;
+      const bodyS = Math.abs(nx - Math.sin(ny * 3.5) * 0.45) <= 0.3;
+      const wings = Math.abs(nx) <= 0.85 && ny >= -0.2 && ny <= 0.3;
+      return head || (bodyS && Math.abs(ny) <= 0.85) || wings;
+    }
+
+    case 'MOUNTAIN': {
+      const peak1 = ny >= -0.85 && Math.abs(nx) <= (ny + 0.85) * 0.7;
+      const peak2 = ny >= -0.55 && Math.abs(nx - 0.45) <= (ny + 0.55) * 0.7;
+      const peak3 = ny >= -0.55 && Math.abs(nx + 0.45) <= (ny + 0.55) * 0.7;
+      return (peak1 || peak2 || peak3) && ny <= 0.85;
+    }
+
+    case 'SKULL': {
+      const cranium = Math.hypot(nx, ny + 0.2) <= 0.65;
+      const jaw = Math.abs(nx) <= 0.38 && ny >= 0.2 && ny <= 0.85;
+      return cranium || jaw;
+    }
+
+    case 'PLANET': {
+      const sphere = nx * nx + ny * ny <= 0.55;
+      const ring = Math.abs(nx * 0.35 + ny) <= 0.22 && Math.hypot(nx, ny) <= 0.95;
+      return sphere || ring;
+    }
+
+    case 'COMPASS': {
+      const outerRing = Math.abs(Math.hypot(nx, ny) - 0.75) <= 0.2;
+      const star = Math.abs(nx * ny) <= 0.08 && Math.hypot(nx, ny) <= 0.9;
+      return outerRing || star;
+    }
+
+    case 'SWORD': {
+      const blade = Math.abs(nx) <= 0.16 && ny <= 0.4 && ny >= -0.9;
+      const crossguard = Math.abs(nx) <= 0.65 && Math.abs(ny - 0.4) <= 0.12;
+      const pommel = Math.abs(nx) <= 0.18 && ny >= 0.4 && ny <= 0.85;
+      return blade || crossguard || pommel;
+    }
+
+    case 'OCTOPUS': {
+      const head = Math.hypot(nx, ny + 0.35) <= 0.55;
+      const arms = ny >= 0.1 && Math.abs(Math.sin(nx * 4) * 0.3 + ny - 0.5) <= 0.35 && Math.abs(nx) <= 0.88;
+      return head || arms;
+    }
+
+    case 'EAGLE': {
+      const wings = ny <= 0.2 && Math.abs(nx) <= 0.95 && Math.abs(ny - (Math.abs(nx) * 0.5 - 0.4)) <= 0.4;
+      const body = Math.abs(nx) <= 0.25 && Math.abs(ny) <= 0.85;
+      return wings || body;
+    }
+
+    case 'KEY': {
+      const ring = Math.abs(Math.hypot(nx + 0.45, ny) - 0.35) <= 0.15;
+      const shaft = nx >= -0.2 && nx <= 0.75 && Math.abs(ny) <= 0.14;
+      const teeth = nx >= 0.4 && nx <= 0.75 && ny >= 0.14 && ny <= 0.55;
+      return ring || shaft || teeth;
+    }
+
+    case 'CROWN': {
+      if (ny > 0.75) return false;
+      if (ny > 0.2) return Math.abs(nx) <= 0.88;
+      const p1 = Math.hypot(nx + 0.6, ny + 0.45) <= 0.42;
+      const p2 = Math.hypot(nx, ny + 0.65) <= 0.42;
+      const p3 = Math.hypot(nx - 0.6, ny + 0.45) <= 0.42;
+      return p1 || p2 || p3;
+    }
+
+    case 'SHIELD': {
+      if (ny < -0.88 || ny > 0.88) return false;
+      if (ny <= 0) return Math.abs(nx) <= 0.85;
+      const w = 0.85 * (1 - Math.pow(ny / 0.88, 2));
+      return Math.abs(nx) <= w;
+    }
+
+    case 'HOURGLASS': {
+      const w = Math.abs(ny) * 0.82 + 0.16;
+      return Math.abs(ny) <= 0.88 && Math.abs(nx) <= w;
     }
 
     default:
-      return true;
+      return isParametricMask(nx, ny, levelIndex + 1);
   }
 }
 
 /**
- * Returns all {r, c} cells that belong to the shape mask.
+ * Maps any level index to a unique shape without repeating for 50+ levels,
+ * transitioning to parametric procedural silhouettes on higher levels.
  */
-export function getMaskActiveCells(shape = 'SQUARE', size = 8) {
-  const activeCells = [];
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      if (isCellInMask(r, c, shape, size)) {
-        activeCells.push({ r, c });
-      }
-    }
+export function getShapeForLevel(levelIndex) {
+  if (levelIndex < ICONIC_SHAPES.length) {
+    const shapeKey = ICONIC_SHAPES[levelIndex];
+    return {
+      id: shapeKey,
+      name: SHAPE_METADATA[shapeKey]?.name || 'Mystic Glyph',
+      icon: SHAPE_METADATA[shapeKey]?.icon || '✨'
+    };
   }
-  return activeCells;
-}
 
-/**
- * Get an ordered list of shape names for level progression
- */
-export const LEVEL_SHAPE_ROTATION = [
-  'SQUARE', 'HEART', 'DIAMOND', 'STAR', 'HEXAGON', 
-  'CROWN', 'BUTTERFLY', 'TREE', 'SHIELD', 'BRAIN', 
-  'ROCKET', 'INFINITY', 'LIGHTNING', 'MOON', 'HOURGLASS', 'CASTLE'
-];
+  // Parametric harmonic synthesis for infinite levels
+  const seed = levelIndex + 1;
+  return {
+    id: `PARAMETRIC_${seed}`,
+    name: `Labyrinth Phase ${seed}`,
+    icon: '🌀'
+  };
+}

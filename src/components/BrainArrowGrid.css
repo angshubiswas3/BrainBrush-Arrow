@@ -4,19 +4,23 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-height: 480px;
   position: relative;
   box-sizing: border-box;
-  touch-action: none; /* enables native multi-touch gestures */
+  touch-action: none;
   user-select: none;
+  border-radius: 24px;
+  padding: 12px;
+  overflow: hidden;
 }
 
-/* Top HUD */
+/* Minimal Top HUD */
 .board-top-hud {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   width: 100%;
   position: relative;
   z-index: 20;
@@ -26,13 +30,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.3px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
 }
 
 .world-icon, .shape-icon {
@@ -40,7 +45,7 @@
 }
 
 .arrow-count-badge {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 0.75rem;
@@ -48,17 +53,17 @@
 
 .combo-multiplier-pill {
   position: absolute;
-  right: 16px;
+  right: 12px;
   color: #0f172a;
   font-weight: 900;
   font-size: 0.82rem;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.75);
   letter-spacing: 0.5px;
 }
 
-/* Viewport & Board Container */
+/* Floating Viewport - Zero Container Boxes or Borders */
 .brain-arrow-viewport {
   position: relative;
   display: flex;
@@ -69,27 +74,25 @@
   touch-action: none;
 }
 
-.brain-arrow-board {
+.brain-arrow-floating-canvas {
   position: relative;
-  border-radius: 28px;
-  box-shadow: 
-    0 20px 40px -8px rgba(0, 0, 0, 0.4),
-    0 6px 16px -4px rgba(0, 0, 0, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.08);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
   user-select: none;
   cursor: grab;
   will-change: transform;
 }
 
-.brain-arrow-board:active {
+.brain-arrow-floating-canvas:active {
   cursor: grabbing;
 }
 
-/* Dot Matrix Layer */
+/* Dot Matrix Layer (Subtle guide dots outlining the silhouette) */
 .dot-matrix-layer {
   position: absolute;
   top: 0;
@@ -114,10 +117,9 @@
 }
 
 .dot-pill {
-  width: 4.5px;
-  height: 4.5px;
+  width: 3.2px;
+  height: 3.2px;
   border-radius: 50%;
-  opacity: 0.65;
   transition: background-color 0.3s;
 }
 
@@ -135,19 +137,24 @@
 .winding-arrow-group {
   cursor: pointer;
   touch-action: manipulation;
+  transition: transform 0.12s ease-out;
+}
+
+.winding-arrow-group:active {
+  transform: scale(1.025);
 }
 
 .arrow-body-path {
-  transition: stroke 0.15s, filter 0.15s;
+  transition: filter 0.15s, stroke 0.15s;
 }
 
 .arrow-head-poly {
-  transition: fill 0.15s, filter 0.15s;
+  transition: filter 0.15s, fill 0.15s;
 }
 
 .winding-arrow-group:hover .arrow-body-path,
 .winding-arrow-group:hover .arrow-head-poly {
-  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.45));
 }
 
 .winding-arrow-group.arrow-is-flying {
@@ -156,18 +163,18 @@
 
 .winding-arrow-group.arrow-is-flying .arrow-body-path,
 .winding-arrow-group.arrow-is-flying .arrow-head-poly {
-  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.9));
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.85));
 }
 
-/* Blocked Shake Feedback */
+/* Refined Blocked Soft Shake */
 .arrow-blocked-shake {
-  animation: blockedShake 0.35s ease-in-out;
+  animation: luxuryBlockedShake 0.35s ease-in-out;
 }
 
-@keyframes blockedShake {
+@keyframes luxuryBlockedShake {
   0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-5px); }
-  40%, 80% { transform: translateX(5px); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
 }
 
 /* Exit Sparkle Bursts */
@@ -185,13 +192,13 @@
 
 .sparkle-ring {
   position: absolute;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: 2px solid #38bdf8;
-  box-shadow: 0 0 12px #38bdf8;
+  box-shadow: 0 0 14px #38bdf8;
 }
 
 .sparkle-star {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
 }

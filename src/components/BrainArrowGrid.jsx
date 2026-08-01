@@ -1,15 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { isCellInMask, SHAPE_METADATA } from '../engine/shapeMasks';
+import { isCellInMask } from '../engine/shapeMasks';
 import { MECHANIC_TYPES, handleMechanicsOnArrowRemoved } from '../engine/specialMechanics';
 import './BrainArrowGrid.css';
 
 const DELTAS = {
-  UP: { r: -1, c: 0 },
-  DOWN: { r: 1, c: 0 },
-  LEFT: { r: 0, c: -1 },
-  RIGHT: { r: 0, c: 1 }
+  UP: { r: -1, c: 0, angle: -90 },
+  DOWN: { r: 1, c: 0, angle: 90 },
+  LEFT: { r: 0, c: -1, angle: 180 },
+  RIGHT: { r: 0, c: 1, angle: 0 }
 };
+
+/**
+ * Builds continuous, rounded Bézier fillet paths across all corner turns.
+ * The path connects smoothly from tail (P0) to the exact center of the head cell (P_last).
+ */
+function buildRoundedFilletPath(pxPoints, radius = 7) {
+  if (!pxPoints || pxPoints.length === 0) return '';
+  if (pxPoints.length === 1) return `M ${pxPoints[0].x} ${pxPoints[0].y}`;
+  if (pxPoints.length === 2) return `M ${pxPoints[0].x} ${pxPoints[0].y} L ${pxPoints[1].x} ${pxPoints[1].y}`;
+
+  let d = `M ${pxPoints[0].x} ${pxPoints[0].y}`;
+
+  for (let i = 1; i < pxPoints.length - 1; i++) {
+    const prev = pxPoints[i - 1];
+    const curr = pxPoints[i];
+    const next = pxPoints[i + 1];
+
+    const d1x = curr.x - prev.x;
+    const d1y = curr.y - prev.y;
+    const len1 = Math.hypot(d1x, d1y);
+
+    const d2x = next.x - curr.x;
+    const d2y = next.y - curr.y;
+    const len2 = Math.hypot(d2x, d2y);
+
+    const r = Math.min(radius, len1 / 2, len2 / 2);
+
+    const inX = curr.x - (d1x / len1) * r;
+    const inY = curr.y - (d1y / len1) * r;
+    const outX = curr.x + (d2x / len2) * r;
+    const outY = curr.y + (d2y / len2) * r;
+
+    d += ` L ${inX} ${inY} Q ${curr.x} ${curr.y} ${outX} ${outY}`;
+  }
+
+  const last = pxPoints[pxPoints.length - 1];
+  d += ` L ${last.x} ${last.y}`;
+  return d;
+}
 
 const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
   const [arrows, setArrows] = useState(levelData.arrows || []);
@@ -19,7 +58,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
   const [fxEvents, setFxEvents] = useState([]);
   const [combo, setCombo] = useState(0);
 
-  // Native Mobile Camera State (Google Maps Style)
+  // Floating Gesture Camera (Pinch, Drag, Double-Tap)
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
 
@@ -28,15 +67,28 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
   const touchStateRef = useRef({ initialDist: null, initialScale: 1, lastTapTime: 0 });
   const comboTimerRef = useRef(null);
 
-  const size = levelData.size || 9;
-  const shape = levelData.shape || 'SQUARE';
+  const size = levelData.size || 13;
+  const shape = levelData.shape || 'SPIRAL';
   const theme = levelData.theme || {};
-  const shapeInfo = SHAPE_METADATA[shape] || SHAPE_METADATA.SQUARE;
+  const shapeInfo = {
+    name: levelData.shapeName || 'Vortex Spiral',
+    icon: levelData.shapeIcon || '🌀'
+  };
 
-  const CELL_SIZE = Math.min(42, Math.floor(340 / size));
+  // Responsive dynamic cell size
+  const CELL_SIZE = Math.min(34, Math.floor(350 / size));
   const BOARD_SIZE = size * CELL_SIZE;
+  const STROKE_WIDTH = Math.max(5.2, CELL_SIZE * 0.18);
+  const CORNER_RADIUS = Math.max(6, CELL_SIZE * 0.28);
+  const EXIT_DISTANCE = 650;
 
-  // Auto-fit camera on level load
+  // Modern Aerodynamic Arrowhead Dimensions
+  const HEAD_TIP = Math.max(12, Math.round(CELL_SIZE * 0.42));
+  const HEAD_BASE = Math.max(6, Math.round(CELL_SIZE * 0.22));
+  const HEAD_HALF_WIDTH = Math.max(8.5, Math.round(CELL_SIZE * 0.30));
+  const HEAD_INDENT = Math.max(2.5, Math.round(HEAD_BASE * 0.45));
+
+  // Auto-fit on level load
   useEffect(() => {
     setArrows(levelData.arrows || []);
     setScale(1);
@@ -44,10 +96,10 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
     setCombo(0);
   }, [levelData]);
 
-  // Level complete detection
+  // Level completion
   useEffect(() => {
     if (arrows.length === 0) {
-      if (navigator.vibrate) navigator.vibrate([30, 50, 60, 50, 100]);
+      if (navigator.vibrate) navigator.vibrate([30, 40, 60, 40, 100]);
       const timer = setTimeout(() => {
         if (onLevelComplete) onLevelComplete();
       }, 550);
@@ -55,13 +107,11 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
     }
   }, [arrows.length, onLevelComplete]);
 
-  // Convert grid (r, c) to pixel center (x, y)
   const getPointPx = (r, c) => ({
     x: c * CELL_SIZE + CELL_SIZE / 2,
     y: r * CELL_SIZE + CELL_SIZE / 2
   });
 
-  // Collision raycast check to board perimeter
   const checkArrowClear = (arrow, currentArrows) => {
     if (arrow.isLocked || arrow.isFrozen) return false;
 
@@ -94,10 +144,8 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
     const isClear = checkArrowClear(arrow, arrows);
 
     if (isClear) {
-      // Haptic feedback
       if (navigator.vibrate) navigator.vibrate(18);
 
-      // Increment Combo
       setCombo(c => c + 1);
       clearTimeout(comboTimerRef.current);
       comboTimerRef.current = setTimeout(() => setCombo(0), 1800);
@@ -106,7 +154,6 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
       const head = pts[pts.length - 1];
       const headPx = getPointPx(head.r, head.c);
 
-      // Sparkle FX
       const newSparkle = {
         id: `spark_${Date.now()}_${Math.random()}`,
         x: headPx.x,
@@ -116,9 +163,8 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
       setSparkles(prev => [...prev, newSparkle]);
       setTimeout(() => {
         setSparkles(prev => prev.filter(s => s.id !== newSparkle.id));
-      }, 700);
+      }, 650);
 
-      // Launch Arrow
       setFlyingIds(prev => [...prev, arrow.id]);
 
       setTimeout(() => {
@@ -147,18 +193,17 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
         });
 
         setFlyingIds(prev => prev.filter(id => id !== arrow.id));
-      }, 500);
+      }, 480);
     } else {
-      // Blocked Feedback
-      if (navigator.vibrate) navigator.vibrate([40, 30, 40]);
+      if (navigator.vibrate) navigator.vibrate([35, 25, 35]);
       setBlockedId(arrow.id);
       setCombo(0);
       if (onWrongMove) onWrongMove();
-      setTimeout(() => setBlockedId(null), 380);
+      setTimeout(() => setBlockedId(null), 360);
     }
   };
 
-  // Touch Gesture Listeners (Pinch-to-Zoom & Double-Tap)
+  // Touch Gesture Listeners (Pinch & Double Tap)
   const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
       const dist = Math.hypot(
@@ -170,7 +215,6 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
     } else if (e.touches.length === 1) {
       const now = Date.now();
       if (now - touchStateRef.current.lastTapTime < 300) {
-        // Double Tap Toggle
         setScale(s => (s > 1.15 ? 1 : 1.75));
         setPan({ x: 0, y: 0 });
       }
@@ -185,7 +229,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
         e.touches[0].clientY - e.touches[1].clientY
       );
       const factor = dist / touchStateRef.current.initialDist;
-      const newScale = Math.min(2.8, Math.max(0.65, touchStateRef.current.initialScale * factor));
+      const newScale = Math.min(3.0, Math.max(0.6, touchStateRef.current.initialScale * factor));
       setScale(newScale);
     }
   };
@@ -194,13 +238,12 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
     touchStateRef.current.initialDist = null;
   };
 
-  // Mouse wheel zoom for desktop testing
   const handleWheel = (e) => {
     e.preventDefault();
     if (e.deltaY < 0) {
-      setScale(s => Math.min(2.8, s + 0.15));
+      setScale(s => Math.min(3.0, s + 0.15));
     } else {
-      setScale(s => Math.max(0.65, s - 0.15));
+      setScale(s => Math.max(0.6, s - 0.15));
     }
   };
 
@@ -216,46 +259,8 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
     return len;
   };
 
-  const buildSvgPathString = (pxPoints) => {
-    if (!pxPoints || pxPoints.length === 0) return '';
-    let d = `M ${pxPoints[0].x} ${pxPoints[0].y}`;
-    for (let i = 1; i < pxPoints.length; i++) {
-      d += ` L ${pxPoints[i].x} ${pxPoints[i].y}`;
-    }
-    return d;
-  };
-
-  const getArrowHeadPolygon = (headPoint, direction) => {
-    const { x, y } = getPointPx(headPoint.r, headPoint.c);
-    const headLen = Math.max(9, Math.round(CELL_SIZE * 0.28));
-    const halfWidth = Math.max(5.5, Math.round(CELL_SIZE * 0.16));
-
-    switch (direction) {
-      case 'UP':
-        return `${x},${y - headLen} ${x - halfWidth},${y + 1} ${x + halfWidth},${y + 1}`;
-      case 'DOWN':
-        return `${x},${y + headLen} ${x - halfWidth},${y - 1} ${x + halfWidth},${y - 1}`;
-      case 'LEFT':
-        return `${x - headLen},${y} ${x + 1},${y - halfWidth} ${x + 1},${y + halfWidth}`;
-      case 'RIGHT':
-        return `${x + headLen},${y} ${x - 1},${y - halfWidth} ${x - 1},${y + halfWidth}`;
-      default:
-        return '';
-    }
-  };
-
-  const getHeadFlightTransform = (direction, distance) => {
-    switch (direction) {
-      case 'UP': return { y: [0, -distance], opacity: [1, 1, 0] };
-      case 'DOWN': return { y: [0, distance], opacity: [1, 1, 0] };
-      case 'LEFT': return { x: [0, -distance], opacity: [1, 1, 0] };
-      case 'RIGHT': return { x: [0, distance], opacity: [1, 1, 0] };
-      default: return {};
-    }
-  };
-
-  const STROKE_WIDTH = Math.max(4, CELL_SIZE * 0.13);
-  const EXIT_DISTANCE = 500;
+  const primaryColor = theme.primaryArrow || '#10b981';
+  const highlightColor = theme.highlightSpine || 'rgba(255, 255, 255, 0.5)';
 
   return (
     <div 
@@ -265,15 +270,16 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      style={{ background: theme.worldGradient || 'transparent' }}
     >
-      {/* Dynamic World & Shape Header Badge */}
+      {/* Top HUD Header */}
       <div className="board-top-hud">
         <motion.div 
           className="world-shape-pill"
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           style={{ 
-            background: theme.tagBg || '#1e293b',
+            background: theme.tagBg || 'rgba(15, 23, 42, 0.65)',
             color: theme.tagText || '#f8fafc'
           }}
         >
@@ -283,7 +289,6 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
           <span className="arrow-count-badge">{arrows.length} left</span>
         </motion.div>
 
-        {/* Dynamic Combo Multiplier Pill */}
         <AnimatePresence>
           {combo > 1 && (
             <motion.div
@@ -299,10 +304,10 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
         </AnimatePresence>
       </div>
 
-      {/* Interactive Viewport (Drag & Pan Enabled with Inertia) */}
+      {/* Floating Canvas (No Container Box or Borders) */}
       <div className="brain-arrow-viewport">
         <motion.div 
-          className="brain-arrow-board" 
+          className="brain-arrow-floating-canvas" 
           ref={boardRef}
           drag={scale > 1.02}
           dragConstraints={containerRef}
@@ -311,11 +316,10 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           style={{ 
             width: `${BOARD_SIZE}px`, 
-            height: `${BOARD_SIZE}px`,
-            background: theme.boardBg || '#0f172a'
+            height: `${BOARD_SIZE}px`
           }}
         >
-          {/* Dot Matrix Layer (Masked to Shape) */}
+          {/* Subtle Silhouette Guide Dots Layer */}
           <div className="dot-matrix-layer">
             {Array.from({ length: size }).map((_, r) => (
               <div key={`dot-row-${r}`} className="dot-matrix-row">
@@ -330,7 +334,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                       {isActive && (
                         <span 
                           className="dot-pill" 
-                          style={{ backgroundColor: theme.dotColor || '#334155' }}
+                          style={{ backgroundColor: theme.dotColor || 'rgba(255,255,255,0.16)' }}
                         ></span>
                       )}
                     </div>
@@ -340,33 +344,44 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
             ))}
           </div>
 
-          {/* High-Performance SVG Arrow Maze Layer */}
+          {/* Premium Vector SVG Arrows Maze */}
           <svg className="winding-arrows-svg" width={BOARD_SIZE} height={BOARD_SIZE}>
             {arrows.map((arrow) => {
               const isBlocked = arrow.id === blockedId;
               const isFlying = flyingIds.includes(arrow.id);
               const verts = arrow.vertices || arrow.points;
-              const headPoint = verts[verts.length - 1];
               const pxPoints = getPixelPoints(verts);
               const bodyLength = getPathLength(pxPoints);
 
-              const delta = DELTAS[arrow.direction];
+              const delta = DELTAS[arrow.direction] || DELTAS.RIGHT;
               const headPx = pxPoints[pxPoints.length - 1];
               const exitPx = {
                 x: headPx.x + delta.c * EXIT_DISTANCE,
                 y: headPx.y + delta.r * EXIT_DISTANCE
               };
               const extendedPxPoints = [...pxPoints, exitPx];
-              const extendedPathD = buildSvgPathString(isFlying ? extendedPxPoints : pxPoints);
+              
+              // Rounded Bézier Fillet Paths
+              const roundedStaticPath = buildRoundedFilletPath(pxPoints, CORNER_RADIUS);
+              const roundedExtendedPath = buildRoundedFilletPath(extendedPxPoints, CORNER_RADIUS);
+              const activePathD = isFlying ? roundedExtendedPath : roundedStaticPath;
               const totalPathLength = bodyLength + EXIT_DISTANCE;
 
-              const headPolygon = getArrowHeadPolygon(headPoint, arrow.direction);
               const activeColor = isBlocked 
                 ? "#ef4444" 
                 : (arrow.isFrozen 
                     ? "#38bdf8" 
-                    : (arrow.isLocked ? "#f59e0b" : (arrow.color || theme.primaryArrow || "#38bdf8"))
+                    : (arrow.isLocked ? "#f59e0b" : primaryColor)
                   );
+
+              const activeHighlight = isBlocked
+                ? "rgba(255, 180, 180, 0.7)"
+                : (arrow.isFrozen ? "rgba(255, 255, 255, 0.8)" : highlightColor);
+
+              const rotationAngle = delta.angle;
+              
+              // Swept-back aerodynamic luxury arrowhead polygon
+              const headPolygonLocal = `${HEAD_TIP},0 ${-HEAD_BASE},${HEAD_HALF_WIDTH} ${-HEAD_INDENT},0 ${-HEAD_BASE},${-HEAD_HALF_WIDTH}`;
 
               return (
                 <g
@@ -374,20 +389,38 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                   className={`winding-arrow-group ${isBlocked ? 'arrow-blocked-shake' : ''} ${isFlying ? 'arrow-is-flying' : ''}`}
                   onClick={() => handleArrowClick(arrow)}
                 >
-                  {/* Generous Touch Target Hitbox */}
+                  {/* Wide Hitbox for Touch Precision */}
                   <path
-                    d={buildSvgPathString(pxPoints)}
+                    d={roundedStaticPath}
                     fill="none"
                     stroke="transparent"
-                    strokeWidth={CELL_SIZE * 0.9}
+                    strokeWidth={CELL_SIZE * 0.95}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     style={{ cursor: 'pointer' }}
                   />
 
-                  {/* Slithering Snake Body Path */}
+                  {/* Layer 1: Soft Ambient Shadow for Stem */}
                   <motion.path
-                    d={extendedPathD}
+                    d={activePathD}
+                    fill="none"
+                    stroke="rgba(0, 0, 0, 0.35)"
+                    strokeWidth={STROKE_WIDTH + 2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray={isFlying ? `${bodyLength} ${totalPathLength}` : 'none'}
+                    initial={{ strokeDashoffset: 0 }}
+                    animate={
+                      isFlying
+                        ? { strokeDashoffset: -EXIT_DISTANCE, opacity: 0 }
+                        : { opacity: 0.6, strokeDashoffset: 0 }
+                    }
+                    transition={isFlying ? { duration: 0.48, ease: [0.32, 0, 0.24, 1] } : { duration: 0.2 }}
+                  />
+
+                  {/* Layer 2: Main Rich Vector Stem Body */}
+                  <motion.path
+                    d={activePathD}
                     className="arrow-body-path"
                     fill="none"
                     stroke={activeColor}
@@ -399,7 +432,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                     animate={
                       isFlying
                         ? { strokeDashoffset: -EXIT_DISTANCE, opacity: [1, 1, 0] }
-                        : (isBlocked ? { x: [-5, 5, -5, 5, 0] } : { opacity: 1, strokeDashoffset: 0, x: 0, y: 0 })
+                        : (isBlocked ? { x: [-4, 4, -4, 4, 0] } : { opacity: 1, strokeDashoffset: 0, x: 0, y: 0 })
                     }
                     transition={
                       isFlying
@@ -408,29 +441,86 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                     }
                   />
 
-                  {/* Arrowhead Geometry */}
-                  <motion.polygon
-                    points={headPolygon}
-                    className="arrow-head-poly"
-                    fill={activeColor}
-                    initial={{ x: 0, y: 0 }}
+                  {/* Layer 3: Specular Inner Highlight Spine */}
+                  <motion.path
+                    d={activePathD}
+                    className="arrow-highlight-spine"
+                    fill="none"
+                    stroke={activeHighlight}
+                    strokeWidth={Math.max(1.5, STROKE_WIDTH * 0.28)}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray={isFlying ? `${bodyLength} ${totalPathLength}` : 'none'}
+                    initial={{ strokeDashoffset: 0 }}
                     animate={
                       isFlying
-                        ? getHeadFlightTransform(arrow.direction, EXIT_DISTANCE)
-                        : (isBlocked ? { x: [-5, 5, -5, 5, 0] } : { opacity: 1, x: 0, y: 0 })
+                        ? { strokeDashoffset: -EXIT_DISTANCE, opacity: 0 }
+                        : { opacity: 0.85, strokeDashoffset: 0 }
+                    }
+                    transition={isFlying ? { duration: 0.48, ease: [0.32, 0, 0.24, 1] } : { duration: 0.2 }}
+                  />
+
+                  {/* Layer 4: Solid, Aerodynamic Arrowhead Capping the Stem */}
+                  <motion.g
+                    initial={{ 
+                      x: headPx.x, 
+                      y: headPx.y, 
+                      rotate: rotationAngle,
+                      opacity: 1 
+                    }}
+                    animate={
+                      isFlying
+                        ? {
+                            x: headPx.x + delta.c * EXIT_DISTANCE,
+                            y: headPx.y + delta.r * EXIT_DISTANCE,
+                            rotate: rotationAngle,
+                            opacity: [1, 1, 0]
+                          }
+                        : (isBlocked
+                            ? { x: [headPx.x - 4, headPx.x + 4, headPx.x - 4, headPx.x + 4, headPx.x], y: headPx.y, rotate: rotationAngle, opacity: 1 }
+                            : { x: headPx.x, y: headPx.y, rotate: rotationAngle, opacity: 1 }
+                          )
                     }
                     transition={
                       isFlying
                         ? { duration: 0.48, ease: [0.32, 0, 0.24, 1] }
                         : { duration: 0.25 }
                     }
-                  />
+                  >
+                    {/* Arrowhead Ambient Shadow */}
+                    <polygon
+                      points={headPolygonLocal}
+                      fill="rgba(0, 0, 0, 0.38)"
+                      transform="translate(0, 1.5)"
+                    />
+
+                    {/* Arrowhead Main Solid Polygon */}
+                    <polygon
+                      points={headPolygonLocal}
+                      className="arrow-head-poly"
+                      fill={activeColor}
+                      stroke={activeColor}
+                      strokeWidth={1.2}
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Arrowhead Specular Highlight Spine */}
+                    <line
+                      x1={-HEAD_INDENT}
+                      y1={0}
+                      x2={HEAD_TIP - 2}
+                      y2={0}
+                      stroke={activeHighlight}
+                      strokeWidth={Math.max(1.4, STROKE_WIDTH * 0.26)}
+                      strokeLinecap="round"
+                    />
+                  </motion.g>
                 </g>
               );
             })}
           </svg>
 
-          {/* Particles & Sparkles */}
+          {/* Sparkles & FX */}
           <AnimatePresence>
             {sparkles.map((sp) => (
               <motion.div
@@ -438,11 +528,11 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                 className="exit-sparkle-burst"
                 style={{ left: sp.x, top: sp.y }}
                 initial={{ scale: 0.5, opacity: 1 }}
-                animate={{ scale: 2.4, opacity: 0 }}
+                animate={{ scale: 2.2, opacity: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
               >
-                <div className="sparkle-ring" style={{ borderColor: sp.color, boxShadow: `0 0 14px ${sp.color}` }}></div>
+                <div className="sparkle-ring" style={{ borderColor: sp.color, boxShadow: `0 0 16px ${sp.color}` }}></div>
                 <span className="sparkle-star">✨</span>
               </motion.div>
             ))}
