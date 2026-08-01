@@ -8,18 +8,33 @@
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+  transition: box-shadow 0.3s;
+}
+
+/* Low Time Heartbeat Vignette Pulse */
+.game-container.low-time-heartbeat-active {
+  box-shadow: inset 0 0 45px rgba(239, 68, 68, 0.45);
+  animation: heartbeatBgPulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes heartbeatBgPulse {
+  0% { box-shadow: inset 0 0 25px rgba(239, 68, 68, 0.25); }
+  100% { box-shadow: inset 0 0 60px rgba(239, 68, 68, 0.6); }
 }
 
 .game-header {
   width: 100%;
-  padding: 1.2rem 1.2rem 0.4rem 1.2rem;
+  max-width: 480px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem 1.5rem 0.5rem 1.5rem;
+  box-sizing: border-box;
+  z-index: 10;
 }
 
 .btn-icon-clear {
-  background: transparent;
+  background: none;
   border: none;
   cursor: pointer;
   display: flex;
@@ -27,131 +42,171 @@
   justify-content: center;
   padding: 8px;
   border-radius: 50%;
-  transition: background 0.15s;
+  transition: background 0.2s;
 }
 
 .btn-icon-clear:active {
-  background: #f1f5f9;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.level-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .level-indicator h1 {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-dark);
   margin: 0;
-  color: var(--text-main);
-  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
-/* Stats Bar */
+.game-submode-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 2px;
+}
+
 .game-stats-bar {
-  display: flex;
   width: 100%;
-  padding: 0.4rem 1.5rem;
+  max-width: 420px;
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  padding: 0.5rem 1.5rem 1rem 1.5rem;
+  box-sizing: border-box;
+  z-index: 10;
 }
 
 .stat-badge {
-  background: #f1f5f9;
-  padding: 6px 12px;
-  border-radius: 10px;
+  background: var(--card-bg);
+  padding: 6px 14px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--text-main);
+  color: var(--text-dark);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
 .icon-flip {
   transform: rotate(45deg);
 }
 
+/* Timer Pill */
+.timer-pill {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #d97706;
+}
+
+.timer-pill.timer-low-pulse {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+}
+
+.timer-number {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lifeline Hearts */
 .hearts-container {
   display: flex;
-  gap: 6px;
   align-items: center;
+  gap: 6px;
 }
 
 .heart-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: filter 0.3s;
 }
 
-.heart-lost {
+.heart-wrapper.heart-lost {
   filter: grayscale(1);
 }
 
 .difficulty-badge {
-  background: #f1f5f9;
-  padding: 6px 16px;
-  border-radius: 10px;
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text-muted);
-  font-size: 0.95rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #bbf7d0;
 }
 
-/* Game Board Area - centered with safe padding */
 .game-area {
   flex: 1;
+  width: 100%;
+  max-width: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
   position: relative;
-  padding-bottom: 90px; /* Space for floating bottom action buttons */
+  padding: 0 1rem;
   box-sizing: border-box;
+  min-height: 0;
 }
 
-/* Bottom Actions */
 .bottom-actions {
-  position: absolute;
-  bottom: 1.5rem;
-  width: 100%;
   display: flex;
-  justify-content: center;
-  gap: 2rem;
-  z-index: 50;
-  pointer-events: auto;
+  gap: 1.5rem;
+  padding: 1rem 0 1.75rem 0;
+  z-index: 10;
 }
 
 .btn-fab {
-  width: 68px;
-  height: 68px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: white;
+  background: var(--card-bg);
   border: none;
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.18), 0 4px 10px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.btn-fab:hover {
-  transform: scale(1.06);
+  position: relative;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
 }
 
 .btn-fab:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 
 .fab-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: -4px;
+  right: -4px;
   background: var(--accent-blue);
   color: white;
-  font-size: 0.8rem;
-  font-weight: 700;
-  width: 24px;
-  height: 24px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2.5px solid white;
+  border: 2px solid white;
 }
