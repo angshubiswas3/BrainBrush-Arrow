@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
+import { Star, Coins, ArrowRight, Map } from 'lucide-react';
 import './VictoryModal.css';
 
 const VictoryModal = ({ onNext }) => {
   const coins = useGameStore(state => state.coins);
   const stars = useGameStore(state => state.stars);
+  const openMap = useGameStore(state => state.openMap);
 
   return (
     <motion.div 
@@ -23,28 +25,42 @@ const VictoryModal = ({ onNext }) => {
         <h2>Level Cleared!</h2>
         
         <div className="victory-stars">
-          <motion.span initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.2, type: "spring" }}>⭐</motion.span>
-          <motion.span initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.4, type: "spring" }}>⭐</motion.span>
-          <motion.span initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.6, type: "spring" }}>⭐</motion.span>
+          <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.2, type: "spring" }}>
+            <Star size={36} fill="#fbbf24" color="#f59e0b" />
+          </motion.div>
+          <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1.2, rotate: 0 }} transition={{ delay: 0.4, type: "spring" }}>
+            <Star size={44} fill="#fbbf24" color="#f59e0b" />
+          </motion.div>
+          <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.6, type: "spring" }}>
+            <Star size={36} fill="#fbbf24" color="#f59e0b" />
+          </motion.div>
         </div>
 
         <div className="victory-rewards">
           <div className="reward">
-            <span>🪙</span> +50
+            <Coins size={20} color="#eab308" /> +50
           </div>
           <div className="reward">
-            <span>⭐</span> +3
+            <Star size={20} fill="#fbbf24" color="#f59e0b" /> +3
           </div>
         </div>
 
-        <motion.button 
-          className="btn-primary" 
-          onClick={onNext}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Next Level
-        </motion.button>
+        <div className="victory-actions">
+          <motion.button 
+            className="btn-primary" 
+            onClick={onNext}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>Next Level</span>
+            <ArrowRight size={20} strokeWidth={2.5} />
+          </motion.button>
+
+          <button className="btn-secondary-map" onClick={openMap}>
+            <Map size={18} color="#3b82f6" />
+            <span>Map</span>
+          </button>
+        </div>
       </motion.div>
     </motion.div>
   );

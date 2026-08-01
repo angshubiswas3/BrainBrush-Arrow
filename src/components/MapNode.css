@@ -1,0 +1,162 @@
+.map-node-wrapper {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.map-node-button {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: manipulation;
+  transition: transform 0.15s ease;
+}
+
+/* Glossy highlight on platform */
+.node-gloss {
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  right: 12px;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 50% 50% 30% 30%;
+  pointer-events: none;
+}
+
+.node-level-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.node-level-text.locked {
+  font-size: 0.9rem;
+  color: #64748b;
+  text-shadow: none;
+}
+
+/* =========================================
+   COMPLETED STATE
+   ========================================= */
+.map-node-wrapper.completed .map-node-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 
+    0 6px 0 #047857,
+    0 10px 20px rgba(16, 185, 129, 0.35);
+  border: 2px solid #6ee7b7;
+}
+
+.completed-check-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #059669;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.node-stars-row {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  padding: 2px 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================
+   ACTIVE / CURRENT STATE
+   ========================================= */
+.map-node-wrapper.active {
+  z-index: 20;
+}
+
+.map-node-wrapper.active .map-node-button {
+  width: 74px;
+  height: 74px;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  box-shadow: 
+    0 8px 0 #b45309,
+    0 12px 25px rgba(245, 158, 11, 0.5);
+  border: 3.5px solid #fef3c7;
+}
+
+.map-node-wrapper.active .node-level-text {
+  font-size: 1.6rem;
+}
+
+/* Animated Floating Pointer */
+.active-pointer {
+  position: absolute;
+  top: -46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.pointer-tag {
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+  border: 1.5px solid #fef3c7;
+}
+
+/* =========================================
+   LOCKED STATE
+   ========================================= */
+.map-node-wrapper.locked .map-node-button {
+  background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+  box-shadow: 
+    0 5px 0 #94a3b8,
+    0 6px 12px rgba(0, 0, 0, 0.06);
+  border: 2px solid #ffffff;
+}
+
+.locked-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+/* =========================================
+   MILESTONE BOSS / CHEST NODES
+   ========================================= */
+.map-node-wrapper.milestone.completed .map-node-button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  box-shadow: 0 6px 0 #5b21b6, 0 10px 20px rgba(139, 92, 246, 0.4);
+  border-color: #c4b5fd;
+}
+
+.milestone-sparkle {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+}

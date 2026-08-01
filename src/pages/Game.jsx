@@ -18,6 +18,7 @@ const Game = () => {
     nextLevel,
     loseLife,
     restartLevel,
+    openMap,
     goHome
   } = useGameStore();
 
@@ -32,7 +33,7 @@ const Game = () => {
     >
       {/* Top Header */}
       <header className="game-header">
-        <button className="btn-icon-clear" onClick={goHome}>
+        <button className="btn-icon-clear" onClick={openMap}>
           <ChevronLeft size={32} color="var(--accent-blue)" strokeWidth={2.5} />
         </button>
         <div className="level-indicator">

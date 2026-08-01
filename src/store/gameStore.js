@@ -8,31 +8,42 @@ export const useGameStore = create(
     (set, get) => ({
       // Player Progress
       currentLevelIndex: 0,
-      coins: 0,
+      coins: 200,
       stars: 0,
       unlockedLevels: 1,
+      levelStars: {}, // { [levelIndex]: starsEarned }
 
-      // Game State
-      gameState: 'HOME', // HOME, PLAYING, VICTORY, DEFEAT
+      // Game State: HOME, MAP, PLAYING, VICTORY, DEFEAT
+      gameState: 'HOME',
       currentBoard: null,
       lives: 3,
       maxLives: 3,
 
-      // Actions
-      startGame: () => {
-        const idx = get().currentLevelIndex;
+      // Navigation Actions
+      openMap: () => set({ gameState: 'MAP' }),
+      goHome: () => set({ gameState: 'HOME', lives: 3 }),
+
+      // Start or Select Specific Level
+      selectLevel: (idx) => {
         let board;
-        
-        // Load handcrafted or generate procedural
         if (idx < levels.length) {
-          // Deep clone to prevent mutating the template
           board = JSON.parse(JSON.stringify(levels[idx]));
           board.id = `level_${idx}_${Date.now()}`;
         } else {
           board = generateLevel(idx);
         }
 
-        set({ gameState: 'PLAYING', currentBoard: board, lives: 3 });
+        set({ 
+          currentLevelIndex: idx, 
+          gameState: 'PLAYING', 
+          currentBoard: board, 
+          lives: 3 
+        });
+      },
+
+      startGame: () => {
+        const idx = get().currentLevelIndex;
+        get().selectLevel(idx);
       },
 
       loseLife: () => {
@@ -45,43 +56,57 @@ export const useGameStore = create(
       },
 
       restartLevel: () => {
-        set({ lives: 3, gameState: 'PLAYING' });
-        get().startGame();
+        const idx = get().currentLevelIndex;
+        get().selectLevel(idx);
       },
 
       completeLevel: () => {
-        set((state) => ({
+        const { currentLevelIndex, lives, levelStars, stars, coins, unlockedLevels } = get();
+        
+        // Calculate stars based on remaining lives
+        const starsEarned = Math.max(1, lives);
+        const previousStars = levelStars[currentLevelIndex] || 0;
+        const newStarsTotal = stars + Math.max(0, starsEarned - previousStars);
+
+        const updatedLevelStars = {
+          ...levelStars,
+          [currentLevelIndex]: Math.max(previousStars, starsEarned)
+        };
+
+        const nextUnlocked = Math.max(unlockedLevels, currentLevelIndex + 2);
+
+        set({
           gameState: 'VICTORY',
-          coins: state.coins + 50,
-          stars: state.stars + 3,
-        }));
+          coins: coins + 50,
+          stars: newStarsTotal,
+          levelStars: updatedLevelStars,
+          unlockedLevels: nextUnlocked
+        });
       },
 
       nextLevel: () => {
-        set((state) => {
-          const nextIdx = state.currentLevelIndex + 1;
-          return {
-            currentLevelIndex: nextIdx,
-            unlockedLevels: Math.max(state.unlockedLevels, nextIdx + 1),
-            gameState: 'PLAYING',
-            lives: 3,
-          };
-        });
-        
-        get().startGame();
+        const nextIdx = get().currentLevelIndex + 1;
+        get().selectLevel(nextIdx);
       },
-      
-      goHome: () => set({ gameState: 'HOME', lives: 3 }),
 
-      resetProgress: () => set({ currentLevelIndex: 0, coins: 0, stars: 0, unlockedLevels: 1, gameState: 'HOME', lives: 3 })
+      resetProgress: () => set({ 
+        currentLevelIndex: 0, 
+        coins: 200, 
+        stars: 0, 
+        unlockedLevels: 1, 
+        levelStars: {}, 
+        gameState: 'HOME', 
+        lives: 3 
+      })
     }),
     {
-      name: 'brainbrush-storage',
+      name: 'brainbrush-storage-v2',
       partialize: (state) => ({ 
         currentLevelIndex: state.currentLevelIndex,
         coins: state.coins,
         stars: state.stars,
-        unlockedLevels: state.unlockedLevels 
+        unlockedLevels: state.unlockedLevels,
+        levelStars: state.levelStars
       }),
     }
   )
