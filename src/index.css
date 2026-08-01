@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-color: #ffffff; /* Pure white background */
+  --text-main: #0f172a; /* Deep navy/black for text */
+  --text-muted: #64748b; /* Muted text */
+  --card-bg: #ffffff;
+  
+  /* Pastel Palette (kept for potential accents) */
+  --accent-yellow: #fedb81;
+  --accent-lavender: #b4c5ff;
+  --accent-peach: #ffa694;
+  --accent-mint: #a3e6c0;
+  --accent-sand: #f5e4c3;
+  --accent-navy: #0A1931; /* New dark stroke color for arrows */
+  --accent-blue: #3b82f6; /* For buttons/icons */
+
+  
+  /* UI Elements */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  overflow: hidden; /* App-like feel, no scrolling */
+  touch-action: none; /* Prevent pinch zoom on mobile */
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
