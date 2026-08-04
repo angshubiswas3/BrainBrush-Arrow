@@ -12,20 +12,33 @@ const DELTAS = {
 };
 
 /**
- * Builds continuous, rounded Bézier fillet paths across all corner turns.
- * The path connects smoothly from tail (P0) to the exact center of the head cell (P_last).
+ * Builds continuous, clean rounded Bézier fillet paths across corner turns.
+ * Automatically eliminates redundant collinear points and generates smooth 90° bends.
  */
-function buildRoundedFilletPath(pxPoints, radius = 7) {
+function buildRoundedFilletPath(pxPoints, radius = 5) {
   if (!pxPoints || pxPoints.length === 0) return '';
   if (pxPoints.length === 1) return `M ${pxPoints[0].x} ${pxPoints[0].y}`;
   if (pxPoints.length === 2) return `M ${pxPoints[0].x} ${pxPoints[0].y} L ${pxPoints[1].x} ${pxPoints[1].y}`;
 
-  let d = `M ${pxPoints[0].x} ${pxPoints[0].y}`;
-
-  for (let i = 1; i < pxPoints.length - 1; i++) {
-    const prev = pxPoints[i - 1];
+  // 1. Clean up duplicate / near-identical consecutive points
+  const pts = [pxPoints[0]];
+  for (let i = 1; i < pxPoints.length; i++) {
+    const prev = pts[pts.length - 1];
     const curr = pxPoints[i];
-    const next = pxPoints[i + 1];
+    if (Math.hypot(curr.x - prev.x, curr.y - prev.y) > 0.5) {
+      pts.push(curr);
+    }
+  }
+
+  if (pts.length < 2) return `M ${pxPoints[0].x} ${pxPoints[0].y}`;
+  if (pts.length === 2) return `M ${pts[0].x} ${pts[0].y} L ${pts[1].x} ${pts[1].y}`;
+
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+
+  for (let i = 1; i < pts.length - 1; i++) {
+    const prev = pts[i - 1];
+    const curr = pts[i];
+    const next = pts[i + 1];
 
     const d1x = curr.x - prev.x;
     const d1y = curr.y - prev.y;
@@ -35,8 +48,18 @@ function buildRoundedFilletPath(pxPoints, radius = 7) {
     const d2y = next.y - curr.y;
     const len2 = Math.hypot(d2x, d2y);
 
-    const r = Math.min(radius, len1 / 2, len2 / 2);
+    if (len1 < 0.2 || len2 < 0.2) continue;
 
+    // Check if points are collinear in the same direction
+    const cross = (d1x * d2y - d1y * d2x) / (len1 * len2);
+    const dot = (d1x * d2x + d1y * d2y) / (len1 * len2);
+
+    if (Math.abs(cross) < 0.05 && dot > 0) {
+      // Collinear straight segment, continue without corner fillet
+      continue;
+    }
+
+    const r = Math.min(radius, len1 / 2, len2 / 2);
     const inX = curr.x - (d1x / len1) * r;
     const inY = curr.y - (d1y / len1) * r;
     const outX = curr.x + (d2x / len2) * r;
@@ -45,7 +68,7 @@ function buildRoundedFilletPath(pxPoints, radius = 7) {
     d += ` L ${inX} ${inY} Q ${curr.x} ${curr.y} ${outX} ${outY}`;
   }
 
-  const last = pxPoints[pxPoints.length - 1];
+  const last = pts[pts.length - 1];
   d += ` L ${last.x} ${last.y}`;
   return d;
 }
@@ -76,17 +99,19 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
   };
 
   // Responsive dynamic cell size
-  const CELL_SIZE = Math.min(34, Math.floor(350 / size));
+  const CELL_SIZE = Math.min(32, Math.floor(340 / size));
   const BOARD_SIZE = size * CELL_SIZE;
-  const STROKE_WIDTH = Math.max(5.2, CELL_SIZE * 0.18);
-  const CORNER_RADIUS = Math.max(6, CELL_SIZE * 0.28);
+
+  // Classic Proper Vector Geometry (Matching reference):
+  const STROKE_WIDTH = Math.max(3.2, Math.min(4.5, CELL_SIZE * 0.15));
+  const CORNER_RADIUS = Math.max(3.5, Math.min(6, CELL_SIZE * 0.20));
   const EXIT_DISTANCE = 650;
 
-  // Modern Aerodynamic Arrowhead Dimensions
-  const HEAD_TIP = Math.max(12, Math.round(CELL_SIZE * 0.42));
-  const HEAD_BASE = Math.max(6, Math.round(CELL_SIZE * 0.22));
-  const HEAD_HALF_WIDTH = Math.max(8.5, Math.round(CELL_SIZE * 0.30));
-  const HEAD_INDENT = Math.max(2.5, Math.round(HEAD_BASE * 0.45));
+  // Classic Arrowhead Dimensions:
+  const HEAD_LEN = Math.max(7.5, Math.min(11, CELL_SIZE * 0.38));      // Arrowhead length
+  const HEAD_WIDTH = Math.max(5, Math.min(7.5, CELL_SIZE * 0.24));     // Wing half-width
+  const HEAD_BARB = Math.max(1.8, Math.min(3, CELL_SIZE * 0.10));      // Barb swept depth
+  const TIP_OFFSET = CELL_SIZE * 0.36;                                // Offset from head cell center
 
   // Auto-fit on level load
   useEffect(() => {
@@ -193,7 +218,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
         });
 
         setFlyingIds(prev => prev.filter(id => id !== arrow.id));
-      }, 480);
+      }, 450);
     } else {
       if (navigator.vibrate) navigator.vibrate([35, 25, 35]);
       setBlockedId(arrow.id);
@@ -247,20 +272,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
     }
   };
 
-  const getPixelPoints = (verts) => verts.map(v => getPointPx(v.r, v.c));
-
-  const getPathLength = (pxPoints) => {
-    let len = 0;
-    for (let i = 0; i < pxPoints.length - 1; i++) {
-      const dx = pxPoints[i + 1].x - pxPoints[i].x;
-      const dy = pxPoints[i + 1].y - pxPoints[i].y;
-      len += Math.hypot(dx, dy);
-    }
-    return len;
-  };
-
-  const primaryColor = theme.primaryArrow || '#10b981';
-  const highlightColor = theme.highlightSpine || 'rgba(255, 255, 255, 0.5)';
+  const primaryColor = theme.primaryArrow || '#0f172a';
 
   return (
     <div 
@@ -270,7 +282,6 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      style={{ background: theme.worldGradient || 'transparent' }}
     >
       {/* Top HUD Header */}
       <div className="board-top-hud">
@@ -278,10 +289,6 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
           className="world-shape-pill"
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{ 
-            background: theme.tagBg || 'rgba(15, 23, 42, 0.65)',
-            color: theme.tagText || '#f8fafc'
-          }}
         >
           <span className="world-icon">{theme.worldIcon || '✨'}</span>
           <span className="shape-icon">{shapeInfo.icon}</span>
@@ -296,7 +303,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              style={{ background: theme.glowColor || '#38bdf8' }}
+              style={{ background: theme.glowColor || '#f59e0b' }}
             >
               🔥 {combo}x COMBO!
             </motion.div>
@@ -304,8 +311,14 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
         </AnimatePresence>
       </div>
 
-      {/* Floating Canvas (No Container Box or Borders) */}
-      <div className="brain-arrow-viewport">
+      {/* 3D Floating Stage Card */}
+      <div 
+        className="brain-arrow-viewport"
+        style={{
+          background: theme.stageBg || 'rgba(255, 255, 255, 0.94)',
+          borderColor: theme.stageBorder || 'rgba(255, 255, 255, 0.85)'
+        }}
+      >
         <motion.div 
           className="brain-arrow-floating-canvas" 
           ref={boardRef}
@@ -334,7 +347,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                       {isActive && (
                         <span 
                           className="dot-pill" 
-                          style={{ backgroundColor: theme.dotColor || 'rgba(255,255,255,0.16)' }}
+                          style={{ backgroundColor: theme.dotColor || 'rgba(0, 0, 0, 0.10)' }}
                         ></span>
                       )}
                     </div>
@@ -344,54 +357,92 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
             ))}
           </div>
 
-          {/* Premium Vector SVG Arrows Maze */}
+          {/* Clean, Proper, Crisp Vector Maze Arrows */}
           <svg className="winding-arrows-svg" width={BOARD_SIZE} height={BOARD_SIZE}>
             {arrows.map((arrow) => {
               const isBlocked = arrow.id === blockedId;
               const isFlying = flyingIds.includes(arrow.id);
               const verts = arrow.vertices || arrow.points;
-              const pxPoints = getPixelPoints(verts);
-              const bodyLength = getPathLength(pxPoints);
-
               const delta = DELTAS[arrow.direction] || DELTAS.RIGHT;
-              const headPx = pxPoints[pxPoints.length - 1];
-              const exitPx = {
-                x: headPx.x + delta.c * EXIT_DISTANCE,
-                y: headPx.y + delta.r * EXIT_DISTANCE
+
+              // Compute pixel coordinates of all vertices along the grid
+              const cellCenters = verts.map(v => getPointPx(v.r, v.c));
+              const headCellCenter = cellCenters[cellCenters.length - 1];
+
+              // Tip position is towards the front border of the head cell
+              const tipPx = {
+                x: headCellCenter.x + delta.c * TIP_OFFSET,
+                y: headCellCenter.y + delta.r * TIP_OFFSET
               };
-              const extendedPxPoints = [...pxPoints, exitPx];
-              
-              // Rounded Bézier Fillet Paths
-              const roundedStaticPath = buildRoundedFilletPath(pxPoints, CORNER_RADIUS);
-              const roundedExtendedPath = buildRoundedFilletPath(extendedPxPoints, CORNER_RADIUS);
-              const activePathD = isFlying ? roundedExtendedPath : roundedStaticPath;
-              const totalPathLength = bodyLength + EXIT_DISTANCE;
+
+              // The stem line terminates cleanly inside the arrowhead notch
+              const stemEndPx = {
+                x: tipPx.x - delta.c * (HEAD_LEN - HEAD_BARB),
+                y: tipPx.y - delta.r * (HEAD_LEN - HEAD_BARB)
+              };
+
+              let stemPoints;
+              if (cellCenters.length === 1) {
+                // Single cell arrow: line from back of cell to arrowhead notch
+                const tailPx = {
+                  x: headCellCenter.x - delta.c * (CELL_SIZE * 0.28),
+                  y: headCellCenter.y - delta.r * (CELL_SIZE * 0.28)
+                };
+                stemPoints = [tailPx, stemEndPx];
+              } else {
+                // Multi-cell arrow: includes all cell centers (so 90° corners are preserved) + exact stem end
+                stemPoints = [...cellCenters, stemEndPx];
+              }
+
+              const staticStemPath = buildRoundedFilletPath(stemPoints, CORNER_RADIUS);
 
               const activeColor = isBlocked 
                 ? "#ef4444" 
                 : (arrow.isFrozen 
-                    ? "#38bdf8" 
+                    ? "#0ea5e9" 
                     : (arrow.isLocked ? "#f59e0b" : primaryColor)
                   );
 
-              const activeHighlight = isBlocked
-                ? "rgba(255, 180, 180, 0.7)"
-                : (arrow.isFrozen ? "rgba(255, 255, 255, 0.8)" : highlightColor);
+              // Local arrowhead polygon coordinates (tip at 0,0)
+              // Points: Tip(0,0) -> TopWing(-L, -W) -> Notch(-L+B, 0) -> BottomWing(-L, W)
+              const headPolygonLocal = `0,0 ${-HEAD_LEN},${-HEAD_WIDTH} ${-HEAD_LEN + HEAD_BARB},0 ${-HEAD_LEN},${HEAD_WIDTH}`;
 
-              const rotationAngle = delta.angle;
-              
-              // Swept-back aerodynamic luxury arrowhead polygon
-              const headPolygonLocal = `${HEAD_TIP},0 ${-HEAD_BASE},${HEAD_HALF_WIDTH} ${-HEAD_INDENT},0 ${-HEAD_BASE},${-HEAD_HALF_WIDTH}`;
+              const exitDeltaX = delta.c * EXIT_DISTANCE;
+              const exitDeltaY = delta.r * EXIT_DISTANCE;
 
               return (
-                <g
+                <motion.g
                   key={arrow.id}
-                  className={`winding-arrow-group ${isBlocked ? 'arrow-blocked-shake' : ''} ${isFlying ? 'arrow-is-flying' : ''}`}
+                  className={`winding-arrow-group ${isBlocked ? 'arrow-blocked-shake' : ''}`}
                   onClick={() => handleArrowClick(arrow)}
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  animate={
+                    isFlying
+                      ? {
+                          x: exitDeltaX,
+                          y: exitDeltaY,
+                          opacity: [1, 1, 0],
+                          transition: { duration: 0.42, ease: [0.32, 0, 0.24, 1] }
+                        }
+                      : (isBlocked
+                          ? {
+                              x: [-4, 4, -4, 4, 0],
+                              opacity: 1,
+                              transition: { duration: 0.3 }
+                            }
+                          : {
+                              x: 0,
+                              y: 0,
+                              opacity: 1,
+                              scale: 1,
+                              transition: { duration: 0.2 }
+                            }
+                        )
+                  }
                 >
-                  {/* Wide Hitbox for Touch Precision */}
+                  {/* Generous Touch Hitbox */}
                   <path
-                    d={roundedStaticPath}
+                    d={staticStemPath}
                     fill="none"
                     stroke="transparent"
                     strokeWidth={CELL_SIZE * 0.95}
@@ -400,122 +451,31 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                     style={{ cursor: 'pointer' }}
                   />
 
-                  {/* Layer 1: Soft Ambient Shadow for Stem */}
-                  <motion.path
-                    d={activePathD}
-                    fill="none"
-                    stroke="rgba(0, 0, 0, 0.35)"
-                    strokeWidth={STROKE_WIDTH + 2.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeDasharray={isFlying ? `${bodyLength} ${totalPathLength}` : 'none'}
-                    initial={{ strokeDashoffset: 0 }}
-                    animate={
-                      isFlying
-                        ? { strokeDashoffset: -EXIT_DISTANCE, opacity: 0 }
-                        : { opacity: 0.6, strokeDashoffset: 0 }
-                    }
-                    transition={isFlying ? { duration: 0.48, ease: [0.32, 0, 0.24, 1] } : { duration: 0.2 }}
-                  />
-
-                  {/* Layer 2: Main Rich Vector Stem Body */}
-                  <motion.path
-                    d={activePathD}
+                  {/* Clean, Solid, Proper Vector Arrow Stem */}
+                  <path
+                    d={staticStemPath}
                     className="arrow-body-path"
                     fill="none"
                     stroke={activeColor}
                     strokeWidth={STROKE_WIDTH}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeDasharray={isFlying ? `${bodyLength} ${totalPathLength}` : 'none'}
-                    initial={{ strokeDashoffset: 0 }}
-                    animate={
-                      isFlying
-                        ? { strokeDashoffset: -EXIT_DISTANCE, opacity: [1, 1, 0] }
-                        : (isBlocked ? { x: [-4, 4, -4, 4, 0] } : { opacity: 1, strokeDashoffset: 0, x: 0, y: 0 })
-                    }
-                    transition={
-                      isFlying
-                        ? { duration: 0.48, ease: [0.32, 0, 0.24, 1] }
-                        : { duration: 0.25 }
-                    }
                   />
 
-                  {/* Layer 3: Specular Inner Highlight Spine */}
-                  <motion.path
-                    d={activePathD}
-                    className="arrow-highlight-spine"
-                    fill="none"
-                    stroke={activeHighlight}
-                    strokeWidth={Math.max(1.5, STROKE_WIDTH * 0.28)}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeDasharray={isFlying ? `${bodyLength} ${totalPathLength}` : 'none'}
-                    initial={{ strokeDashoffset: 0 }}
-                    animate={
-                      isFlying
-                        ? { strokeDashoffset: -EXIT_DISTANCE, opacity: 0 }
-                        : { opacity: 0.85, strokeDashoffset: 0 }
-                    }
-                    transition={isFlying ? { duration: 0.48, ease: [0.32, 0, 0.24, 1] } : { duration: 0.2 }}
-                  />
-
-                  {/* Layer 4: Solid, Aerodynamic Arrowhead Capping the Stem */}
-                  <motion.g
-                    initial={{ 
-                      x: headPx.x, 
-                      y: headPx.y, 
-                      rotate: rotationAngle,
-                      opacity: 1 
-                    }}
-                    animate={
-                      isFlying
-                        ? {
-                            x: headPx.x + delta.c * EXIT_DISTANCE,
-                            y: headPx.y + delta.r * EXIT_DISTANCE,
-                            rotate: rotationAngle,
-                            opacity: [1, 1, 0]
-                          }
-                        : (isBlocked
-                            ? { x: [headPx.x - 4, headPx.x + 4, headPx.x - 4, headPx.x + 4, headPx.x], y: headPx.y, rotate: rotationAngle, opacity: 1 }
-                            : { x: headPx.x, y: headPx.y, rotate: rotationAngle, opacity: 1 }
-                          )
-                    }
-                    transition={
-                      isFlying
-                        ? { duration: 0.48, ease: [0.32, 0, 0.24, 1] }
-                        : { duration: 0.25 }
-                    }
+                  {/* Sharp, Classic Filled Vector Arrowhead */}
+                  <g
+                    transform={`translate(${tipPx.x}, ${tipPx.y}) rotate(${delta.angle})`}
                   >
-                    {/* Arrowhead Ambient Shadow */}
-                    <polygon
-                      points={headPolygonLocal}
-                      fill="rgba(0, 0, 0, 0.38)"
-                      transform="translate(0, 1.5)"
-                    />
-
-                    {/* Arrowhead Main Solid Polygon */}
                     <polygon
                       points={headPolygonLocal}
                       className="arrow-head-poly"
                       fill={activeColor}
                       stroke={activeColor}
-                      strokeWidth={1.2}
+                      strokeWidth={0.8}
                       strokeLinejoin="round"
                     />
-
-                    {/* Arrowhead Specular Highlight Spine */}
-                    <line
-                      x1={-HEAD_INDENT}
-                      y1={0}
-                      x2={HEAD_TIP - 2}
-                      y2={0}
-                      stroke={activeHighlight}
-                      strokeWidth={Math.max(1.4, STROKE_WIDTH * 0.26)}
-                      strokeLinecap="round"
-                    />
-                  </motion.g>
-                </g>
+                  </g>
+                </motion.g>
               );
             })}
           </svg>

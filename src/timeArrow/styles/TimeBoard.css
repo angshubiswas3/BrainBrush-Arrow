@@ -1,0 +1,79 @@
+/* src/timeArrow/styles/TimeBoard.css */
+
+.time-board-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  touch-action: none;
+}
+
+.time-board-frame {
+  position: relative;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 28px;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.35),
+    0 0 50px rgba(56, 189, 248, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+}
+
+.time-board-grid {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Sparkle Star Burst */
+.time-sparkle-burst {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+
+.time-sparkle-star {
+  font-size: 24px;
+  filter: drop-shadow(0 0 10px #facc15);
+  animation: timeSparklePop 0.5s ease-out forwards;
+}
+
+@keyframes timeSparklePop {
+  0% { transform: scale(0.3) rotate(0deg); opacity: 1; }
+  60% { transform: scale(1.6) rotate(45deg); opacity: 0.9; }
+  100% { transform: scale(2.2) rotate(90deg); opacity: 0; }
+}
+
+/* Combo floating text popup */
+.time-combo-floater {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #facc15;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 12px rgba(250, 204, 21, 0.6);
+  z-index: 20;
+  animation: timeFloatUp 0.75s ease-out forwards;
+}
+
+@keyframes timeFloatUp {
+  0% { transform: translate(-50%, 0) scale(0.6); opacity: 0; }
+  25% { transform: translate(-50%, -15px) scale(1.25); opacity: 1; }
+  100% { transform: translate(-50%, -45px) scale(1); opacity: 0; }
+}

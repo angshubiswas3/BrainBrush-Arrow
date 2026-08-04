@@ -1,0 +1,124 @@
+.world-gate-arch-container {
+  position: absolute;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 8;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+.gate-arch-card {
+  pointer-events: auto;
+  position: relative;
+  width: 90%;
+  max-width: 360px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 2px solid #f59e0b;
+  border-radius: 24px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 
+    0 12px 32px -4px rgba(245, 158, 11, 0.35),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.gate-locked .gate-arch-card {
+  border-color: #475569;
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.gate-pillar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pillar-cap {
+  font-size: 1.4rem;
+}
+
+.pillar-torch {
+  font-size: 1.1rem;
+  animation: torchFlicker 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes torchFlicker {
+  0% { transform: scale(0.9) rotate(-3deg); filter: brightness(0.9); }
+  100% { transform: scale(1.15) rotate(3deg); filter: brightness(1.3) drop-shadow(0 0 8px #f59e0b); }
+}
+
+.gate-center-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+}
+
+.gate-crown-badge {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1.5px solid #f59e0b;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gate-locked .gate-crown-badge {
+  border-color: #64748b;
+  background: rgba(100, 116, 139, 0.15);
+}
+
+.gate-info-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.gate-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gate-world-icon {
+  font-size: 1.25rem;
+}
+
+.gate-world-name {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+}
+
+.gate-status-sub {
+  color: #facc15;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.gate-locked .gate-status-sub {
+  color: #94a3b8;
+}
+
+.gate-sparkle-spin {
+  animation: spinSparkle 6s infinite linear;
+}
+
+@keyframes spinSparkle {
+  0% { transform: rotate(0deg) scale(0.85); }
+  50% { transform: rotate(180deg) scale(1.15); }
+  100% { transform: rotate(360deg) scale(0.85); }
+}

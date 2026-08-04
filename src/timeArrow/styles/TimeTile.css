@@ -1,0 +1,89 @@
+/* src/timeArrow/styles/TimeTile.css */
+
+.time-tile-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  box-sizing: border-box;
+}
+
+.time-tile-block {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 6px 0 rgba(0, 0, 0, 0.28),
+    0 10px 20px rgba(0, 0, 0, 0.22),
+    inset 0 2px 3px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.25);
+  transition: filter 0.15s ease, transform 0.12s ease;
+  transform: translateZ(0);
+}
+
+.time-tile-block:hover {
+  filter: brightness(1.08);
+}
+
+.time-tile-block:active {
+  box-shadow: 
+    0 2px 0 rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3);
+  transform: translateY(4px);
+}
+
+/* 3D Glossy Light Reflection Sheen */
+.time-tile-sheen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  background: linear-gradient(
+    180deg, 
+    rgba(255, 255, 255, 0.5) 0%, 
+    rgba(255, 255, 255, 0.15) 60%, 
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  pointer-events: none;
+}
+
+/* Arrow Icon Container */
+.time-tile-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+
+/* Blocked Error State */
+.time-tile-blocked {
+  background-color: #ef4444 !important;
+  box-shadow: 
+    0 0 20px rgba(239, 68, 68, 0.8),
+    0 6px 0 #991b1b,
+    inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Empty Grid Slot */
+.time-tile-empty {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px dashed rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}

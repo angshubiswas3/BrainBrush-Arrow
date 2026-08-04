@@ -3,20 +3,23 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: #0f172a;
+  background: 
+    radial-gradient(circle at 10% 10%, rgba(96, 165, 250, 0.15), transparent 45%),
+    radial-gradient(circle at 90% 85%, rgba(226, 249, 82, 0.20), transparent 45%),
+    #f8fafc;
   position: relative;
   overflow: hidden;
   user-select: none;
 }
 
-/* Top Glass Header */
+/* Top Modern Floating Header */
 .home-top-bar {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 70px;
-  background: rgba(15, 23, 42, 0.75);
+  height: 72px;
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   z-index: 50;
@@ -24,7 +27,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
 }
 
 .home-brand {
@@ -34,14 +38,14 @@
 }
 
 .brand-icon-wrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
 }
 
 .brand-text {
@@ -50,18 +54,18 @@
 }
 
 .brand-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 900;
-  color: #ffffff;
+  color: #0f172a;
   margin: 0;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
 }
 
 .brand-sub {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  color: #f59e0b;
-  letter-spacing: 1px;
+  color: #3b82f6;
+  letter-spacing: 1.2px;
 }
 
 .home-top-stats {
@@ -69,23 +73,24 @@
   gap: 8px;
 }
 
-.stat-pill-gold {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+.stat-pill {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
   padding: 6px 12px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   gap: 6px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
 }
 
-.stat-icon {
-  font-size: 0.9rem;
+.stat-emoji {
+  font-size: 0.95rem;
 }
 
 .stat-value {
-  color: #ffffff;
-  font-size: 0.9rem;
+  color: #0f172a;
+  font-size: 0.92rem;
   font-weight: 800;
 }
 
@@ -96,14 +101,10 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-top: 85px;
-  padding-bottom: 2rem;
+  padding-top: 86px;
+  padding-bottom: 2.5rem;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
-  background: 
-    radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.15), transparent 45%),
-    radial-gradient(circle at 20% 60%, rgba(16, 185, 129, 0.15), transparent 45%),
-    linear-gradient(180deg, #090d16 0%, #0f172a 100%);
 }
 
 .home-hub-content {
@@ -118,35 +119,30 @@
 
 /* Hero Section */
 .home-hero-section {
-  text-align: center;
-  margin-bottom: 1.5rem;
+  text-align: left;
+  margin-bottom: 1.25rem;
+  margin-top: 0.25rem;
 }
 
 .hero-eyebrow {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: #38bdf8;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #3b82f6;
   letter-spacing: 1.5px;
   display: inline-block;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .hero-heading {
-  font-size: 1.75rem;
+  font-size: 1.65rem;
   font-weight: 900;
-  color: #ffffff;
-  margin: 0 0 6px 0;
-  letter-spacing: -0.5px;
-}
-
-.hero-desc {
-  font-size: 0.88rem;
-  color: #94a3b8;
+  color: #0f172a;
   margin: 0;
-  line-height: 1.4;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
 }
 
-/* Cards Deck */
+/* Game Cards Deck */
 .game-cards-deck {
   display: flex;
   flex-direction: column;
@@ -154,225 +150,301 @@
 }
 
 .game-hub-card {
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  position: relative;
   border-radius: 28px;
-  padding: 1.25rem;
+  padding: 1.35rem 1.4rem;
   cursor: pointer;
-  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.4);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
 }
 
-.time-arrow-card:hover {
-  border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 20px 35px -10px rgba(59, 130, 246, 0.3);
+/* 1. BRAIN ARROW CARD (Electric Citrus Lime - FLAGSHIP) */
+.brain-arrow-card {
+  background: linear-gradient(145deg, #e4f954 0%, #b8f244 55%, #86efac 100%);
+  color: #0f172a;
+  border: 2.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20px 42px -8px rgba(163, 230, 53, 0.45);
 }
 
-.brain-arrow-card:hover {
-  border-color: rgba(16, 185, 129, 0.6);
-  box-shadow: 0 20px 35px -10px rgba(16, 185, 129, 0.3);
-}
-
-.daily-puzzle-card:hover {
-  border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 20px 35px -10px rgba(245, 158, 11, 0.3);
-}
-
-.card-top-tag {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.tag-pill-fast {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.tag-pill-zen {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.tag-pill-gold {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.stage-badge {
-  background: rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 8px;
-}
-
-.mini-lock-badge {
-  background: rgba(245, 158, 11, 0.15);
-  padding: 4px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Previews */
-.card-preview-zone {
-  height: 64px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.time-preview-zone {
-  background: rgba(15, 23, 42, 0.6);
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.mini-block {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
+.tag-pill-dark {
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.74rem;
   font-weight: 900;
-  font-size: 1.1rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
 }
 
-.mini-coral { background: #FF6B6B; box-shadow: 0 4px 0 #d94545; }
-.mini-mint { background: #4ECDC4; box-shadow: 0 4px 0 #2ea89f; }
-.mini-gold { background: #FFD166; box-shadow: 0 4px 0 #d4a73b; }
-.mini-blue { background: #0984E3; box-shadow: 0 4px 0 #0762a8; }
+.stage-badge-dark {
+  background: rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
 
 .brain-preview-zone {
-  background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.6rem 0;
 }
 
 .mini-dot-grid {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  align-items: center;
-  justify-items: center;
-  opacity: 0.4;
+  display: flex;
+  gap: 16px;
 }
 
 .mini-dot {
-  width: 4px;
-  height: 4px;
-  background: #94a3b8;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
+  background: rgba(15, 23, 42, 0.2);
 }
 
 .mini-winding-svg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 140px;
+  height: 48px;
+  position: relative;
+  z-index: 2;
+}
+
+.brain-arrow-card .card-title {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* 2. TIME ARROW CARD (Electric Sky Blue) */
+.time-arrow-card {
+  background: linear-gradient(145deg, #60a5fa 0%, #3b82f6 60%, #2563eb 100%);
+  color: #ffffff;
+  border: 2.5px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 20px 42px -8px rgba(37, 99, 235, 0.38);
+}
+
+.tag-pill-lime {
+  background: #e2f952;
+  color: #0f172a;
+  font-size: 0.74rem;
+  font-weight: 900;
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+.stage-badge {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+}
+
+.time-preview-zone {
+  display: flex;
+  gap: 10px;
+  margin: 0.8rem 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-block {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffffff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.mini-coral { background: linear-gradient(135deg, #fb7185, #e11d48); }
+.mini-mint { background: linear-gradient(135deg, #34d399, #059669); }
+.mini-gold { background: linear-gradient(135deg, #fbbf24, #d97706); }
+.mini-sky { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+
+.time-arrow-card .card-title {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+/* 3. DAILY CHALLENGE CARD (Clean White Floating Glass) */
+.daily-puzzle-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.06);
+}
+
+.tag-pill-gold {
+  background: #fef3c7;
+  color: #d97706;
+  font-size: 0.74rem;
+  font-weight: 900;
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+.mini-lock-badge {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 4px 8px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
 }
 
 .daily-preview-zone {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px dashed rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.6rem 0;
 }
 
-/* Card Info */
+.daily-calendar-icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: #fffbeb;
+  border: 2px solid #fde68a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15);
+}
+
+.daily-puzzle-card .card-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+}
+
+.daily-status-text {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+/* Card Header and Footer Structure */
+.card-top-tag {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
 .card-title-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 4px;
-}
-
-.card-title {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #ffffff;
-  margin: 0;
-}
-
-.card-pitch {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  margin: 0 0 1rem 0;
-  line-height: 1.35;
+  margin-bottom: 0.4rem;
 }
 
 .card-footer-action {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 0.85rem;
+  margin-top: 0.5rem;
 }
 
-.modes-micro-tags {
-  font-size: 0.75rem;
-  color: #64748b;
-  font-weight: 600;
-}
-
-.daily-status-text {
-  font-size: 0.78rem;
-  color: #f59e0b;
-  font-weight: 700;
-}
-
-.btn-card-play {
-  padding: 8px 18px;
-  border-radius: 999px;
-  border: none;
-  font-size: 0.9rem;
+.card-sub-badge {
+  font-size: 0.84rem;
   font-weight: 800;
-  color: white;
-  cursor: pointer;
+  color: #1e293b;
+  opacity: 0.85;
+}
+
+.card-sub-badge-light {
+  color: #f1f5f9;
+}
+
+/* =========================================================================
+   PROMINENT 30-40% LARGER PLAY BUTTONS (Mobile Game Benchmark CTA)
+   ========================================================================= */
+.btn-card-play {
+  height: 48px;
+  min-width: 124px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
   display: flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  user-select: none;
 }
 
-.btn-play-blue {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+.btn-card-play:hover {
+  transform: scale(1.06);
 }
 
-.btn-play-emerald {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+.btn-card-play:active {
+  transform: scale(0.95) translateY(2px);
 }
 
+/* Dark Play Button on Lime Brain Arrow Card */
+.btn-play-dark {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-play-dark:hover {
+  background: #1e293b;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.45);
+}
+
+/* White Play Button on Sky Blue Time Arrow Card */
+.btn-play-white {
+  background: #ffffff;
+  color: #0284c7;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2), inset 0 1px 1px #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+}
+
+.btn-play-white:hover {
+  background: #f8fafc;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+/* Gold Action Button on Daily Card */
 .btn-play-gold {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  gap: 8px;
+  background: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+  font-size: 0.94rem;
+  height: 44px;
+}
+
+.btn-play-gold:hover {
+  background: #d97706;
 }

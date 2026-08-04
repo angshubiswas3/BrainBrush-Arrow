@@ -1,19 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import MapNode from '../components/MapNode';
+import WorldBackground from '../components/map/WorldBackground';
+import WorldDecorations from '../components/map/WorldDecorations';
+import WorldGateArch from '../components/map/WorldGateArch';
+import TreasureChestModal from '../components/map/TreasureChestModal';
+import { WORLD_BIOMES, getWorldForLevel } from '../components/map/worldThemes';
 import Toast from '../components/Toast';
-import { ChevronLeft, Star, Coins, Play, Sparkles } from 'lucide-react';
+import { ChevronLeft, Star, Coins, Play, Sparkles, Navigation, Heart } from 'lucide-react';
 import './AdventureMap.css';
-
-// Thematic World Biomes
-const WORLDS = [
-  { id: 1, name: 'Emerald Forest', start: 1, end: 25, icon: '🌿' },
-  { id: 2, name: 'Crystal Peaks', start: 26, end: 50, icon: '❄️' },
-  { id: 3, name: 'Sunset Oasis', start: 51, end: 75, icon: '🏜️' },
-  { id: 4, name: 'Cyber Nexus', start: 76, end: 100, icon: '⚡' },
-  { id: 5, name: 'Starlight Cosmos', start: 101, end: 999, icon: '🌌' }
-];
 
 const AdventureMap = () => {
   const { 
@@ -22,29 +18,35 @@ const AdventureMap = () => {
     brainArrowProgress,
     coins, 
     stars, 
+    lives = 3,
     playLevel, 
+    claimChestReward,
     goHome 
   } = useGameStore();
 
   const progress = gameType === 'BRAIN_ARROW' ? brainArrowProgress : timeArrowProgress;
   const unlockedLevels = progress?.unlockedLevels || 1;
   const levelStars = progress?.levelStars || {};
+  const claimedChests = progress?.claimedChests || {};
 
   const scrollContainerRef = useRef(null);
   const nodeRefs = useRef({});
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'lock' });
+  const [activeChestModal, setActiveChestModal] = useState(null);
 
-  // Map Geometry Configuration
-  const totalLevels = Math.max(50, unlockedLevels + 10);
-  const NODE_SPACING_Y = 110;
-  const MAP_WIDTH = 380;
-  const TOTAL_HEIGHT = totalLevels * NODE_SPACING_Y + 240;
+  // Map Geometry Configuration (Centered S-Curve Road for 100 Handcrafted Levels)
+  const totalLevels = Math.max(100, unlockedLevels + 5);
+  const NODE_SPACING_Y = 120;
+  const MAP_WIDTH = 420;
+  const TOTAL_HEIGHT = totalLevels * NODE_SPACING_Y + 280;
 
-  // Calculate Node Positions (Sine-wave S-curve)
+  // Calculate Node Positions with Centered Organic S-Curve
   const nodes = [];
   for (let i = 1; i <= totalLevels; i++) {
-    const y = TOTAL_HEIGHT - (i * NODE_SPACING_Y) - 80;
-    const x = MAP_WIDTH / 2 + Math.sin((i - 1) * 0.85) * (MAP_WIDTH * 0.32);
+    const y = TOTAL_HEIGHT - (i * NODE_SPACING_Y) - 90;
+    // S-curve centered around MAP_WIDTH / 2
+    const curveOffset = Math.sin((i - 1) * 0.72) * (MAP_WIDTH * 0.28) + Math.cos((i - 1) * 0.36) * (MAP_WIDTH * 0.05);
+    const x = (MAP_WIDTH / 2) + curveOffset;
 
     let status = 'LOCKED';
     if (i < unlockedLevels) status = 'COMPLETED';
@@ -61,31 +63,47 @@ const AdventureMap = () => {
       y,
       status,
       stars: levelStars[i - 1] || (status === 'COMPLETED' ? 3 : 0),
-      milestoneType
+      milestoneType,
+      isClaimed: !!claimedChests[i]
     });
   }
 
-  // Auto-scroll to Current Level
+  // Camera positioning: Keep active level around 35-40% from the bottom of viewport
+  const scrollToCurrentLevel = (smooth = true) => {
+    const currentNodeEl = nodeRefs.current[unlockedLevels];
+    const scrollContainer = scrollContainerRef.current;
+    if (currentNodeEl && scrollContainer) {
+      const containerHeight = scrollContainer.clientHeight;
+      const targetY = currentNodeEl.offsetTop - containerHeight * 0.62;
+      scrollContainer.scrollTo({
+        top: targetY,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      const currentNodeEl = nodeRefs.current[unlockedLevels];
-      if (currentNodeEl) {
-        currentNodeEl.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
-      }
-    }, 200);
-
+      scrollToCurrentLevel(false);
+    }, 150);
     return () => clearTimeout(timer);
   }, [unlockedLevels]);
 
   const handleNodeClick = (levelNumber, status) => {
     if (status === 'LOCKED') {
-      showToast(`Complete Level ${levelNumber - 1} to unlock this stage!`, 'lock');
+      showToast(`Complete Level ${levelNumber - 1} to unlock this realm!`, 'lock');
     } else {
       playLevel(levelNumber - 1);
     }
+  };
+
+  const handleChestClick = (milestoneType, levelNumber, isClaimed) => {
+    setActiveChestModal({ milestoneType, levelNumber, isClaimed });
+  };
+
+  const handleClaimChest = (levelNumber, bonusCoins, bonusStars) => {
+    claimChestReward(levelNumber, bonusCoins, bonusStars);
+    showToast(`Claimed +${bonusCoins} 🪙 and +${bonusStars} ⭐!`, 'star');
   };
 
   const showToast = (message, type = 'lock') => {
@@ -95,6 +113,7 @@ const AdventureMap = () => {
     }, 2500);
   };
 
+  // Smooth SVG Bezier Path Generator for the Center Road
   const buildSvgPath = (nodeList) => {
     if (nodeList.length < 2) return '';
     let path = `M ${nodeList[0].x} ${nodeList[0].y}`;
@@ -107,33 +126,37 @@ const AdventureMap = () => {
     return path;
   };
 
+  const allPathD = buildSvgPath(nodes);
   const unlockedNodes = nodes.filter(n => n.levelNumber <= unlockedLevels);
-  const lockedNodes = nodes.filter(n => n.levelNumber >= unlockedLevels);
-
   const unlockedPathD = buildSvgPath(unlockedNodes);
-  const lockedPathD = buildSvgPath(lockedNodes);
 
-  const currentWorld = WORLDS.find(w => unlockedLevels >= w.start && unlockedLevels <= w.end) || WORLDS[0];
+  const currentWorld = getWorldForLevel(unlockedLevels);
 
   return (
     <div className="adventure-map-root">
-      {/* Top Floating HUD */}
+      {/* Top Glassmorphic Floating HUD */}
       <header className="map-hud-header">
-        <button className="map-hud-btn" onClick={goHome}>
-          <ChevronLeft size={28} color="#ffffff" strokeWidth={2.5} />
+        <button className="map-hud-btn" onClick={goHome} title="Home Hub">
+          <ChevronLeft size={28} color="#ffffff" strokeWidth={2.8} />
         </button>
 
+        {/* Center World Biome Badge */}
         <div className="map-world-banner">
           <span className="world-icon">{currentWorld.icon}</span>
           <div className="world-text">
-            <span className="world-title">
-              {gameType === 'BRAIN_ARROW' ? '🧠 Brain ' : '🕒 Time '} {currentWorld.name}
+            <span className="world-title">{currentWorld.name}</span>
+            <span className="world-subtitle">
+              Level {unlockedLevels} • {gameType === 'BRAIN_ARROW' ? '🧠 Zen Logic' : '⚡ Fast Reflexes'}
             </span>
-            <span className="world-subtitle">Level {unlockedLevels}</span>
           </div>
         </div>
 
+        {/* Player Wallets (Stars, Coins, Lives) */}
         <div className="map-wallets">
+          <div className="wallet-pill">
+            <Heart size={16} fill="#ef4444" color="#ef4444" />
+            <span>{lives}</span>
+          </div>
           <div className="wallet-pill">
             <Star size={16} fill="#facc15" color="#facc15" />
             <span>{stars}</span>
@@ -145,91 +168,132 @@ const AdventureMap = () => {
         </div>
       </header>
 
-      {/* Main Scrollable Adventure Path */}
+      {/* Main Scrollable Adventure Viewport */}
       <div className="map-scroll-viewport" ref={scrollContainerRef}>
         <div 
           className="map-canvas-container" 
           style={{ height: `${TOTAL_HEIGHT}px`, width: `${MAP_WIDTH}px` }}
         >
-          {/* Animated Background Environmental Decor */}
-          <div className="map-decorations-layer">
-            {[25, 50, 75, 100].map((gatewayLevel) => {
-              if (gatewayLevel > totalLevels) return null;
-              const node = nodes.find(n => n.levelNumber === gatewayLevel);
-              if (!node) return null;
-              const targetWorld = WORLDS.find(w => w.start === gatewayLevel + 1);
+          {/* Layer 1: Environmental World Biomes & Ambient Particles */}
+          <WorldBackground 
+            totalLevels={totalLevels} 
+            totalHeight={TOTAL_HEIGHT} 
+            nodeSpacingY={NODE_SPACING_Y} 
+          />
 
-              return (
-                <div 
-                  key={`gateway-${gatewayLevel}`} 
-                  className="world-gateway-arch"
-                  style={{ top: `${node.y - 65}px` }}
-                >
-                  <div className="gateway-ribbon">
-                    <Sparkles size={16} color="#facc15" />
-                    <span>Next: {targetWorld?.name || 'New Realm'}</span>
-                  </div>
-                </div>
-              );
-            })}
+          {/* Layer 2: Data-Driven Environmental Props */}
+          <WorldDecorations nodes={nodes} mapWidth={MAP_WIDTH} />
 
-            <div className="floating-cloud cloud-1" style={{ top: '15%' }}>☁️</div>
-            <div className="floating-cloud cloud-2" style={{ top: '45%' }}>☁️</div>
-            <div className="floating-cloud cloud-3" style={{ top: '75%' }}>☁️</div>
-            <div className="floating-island island-1" style={{ top: '30%' }}>🏝️</div>
-            <div className="floating-island island-2" style={{ top: '60%' }}>🎈</div>
-          </div>
+          {/* Layer 3: Grand Milestone World Gate Arches */}
+          {[25, 50, 75, 100].map((gatewayLevel) => {
+            if (gatewayLevel > totalLevels) return null;
+            const node = nodes.find(n => n.levelNumber === gatewayLevel);
+            if (!node) return null;
+            const targetWorld = WORLD_BIOMES.find(w => w.start === gatewayLevel + 1);
+            if (!targetWorld) return null;
 
-          {/* SVG Road Paths */}
+            return (
+              <WorldGateArch 
+                key={`gate-${gatewayLevel}`}
+                targetWorld={targetWorld}
+                currentWorld={currentWorld}
+                isUnlocked={unlockedLevels > gatewayLevel}
+                y={node.y}
+                mapWidth={MAP_WIDTH}
+              />
+            );
+          })}
+
+          {/* Layer 4: Multi-Layered Polished SVG Center Pathway */}
           <svg className="map-svg-roads" width={MAP_WIDTH} height={TOTAL_HEIGHT}>
             <defs>
-              <linearGradient id="unlockedPathGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stopColor="#10b981" />
-                <stop offset="50%" stopColor="#3b82f6" />
+              <linearGradient id="roadBaseGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor="#2d6a4f" />
+                <stop offset="25%" stopColor="#b45309" />
+                <stop offset="50%" stopColor="#0284c7" />
+                <stop offset="75%" stopColor="#be123c" />
+                <stop offset="100%" stopColor="#7e22ce" />
+              </linearGradient>
+
+              <linearGradient id="roadProgressionGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor="#34d399" />
+                <stop offset="50%" stopColor="#fbbf24" />
                 <stop offset="100%" stopColor="#f59e0b" />
               </linearGradient>
-              <filter id="pathGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="5" result="blur" />
+
+              <filter id="roadDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="8" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
             </defs>
 
-            {lockedPathD && (
-              <path
-                d={lockedPathD}
-                className="road-locked"
-                fill="none"
-                stroke="rgba(255, 255, 255, 0.2)"
-                strokeWidth="10"
-                strokeDasharray="8 8"
-                strokeLinecap="round"
-              />
-            )}
+            {/* Path 1: Ground Ambient Soft Shadow */}
+            <path
+              d={allPathD}
+              fill="none"
+              stroke="rgba(0, 0, 0, 0.45)"
+              strokeWidth="32"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
 
+            {/* Path 2: Outer Cobblestone / Curb Border */}
+            <path
+              d={allPathD}
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.18)"
+              strokeWidth="24"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+
+            {/* Path 3: Main Dynamic Biome Road Bed */}
+            <path
+              d={allPathD}
+              className="road-main-bed"
+              fill="none"
+              stroke="url(#roadBaseGrad)"
+              strokeWidth="18"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+
+            {/* Path 4: Stepping Stones & Dash Markers */}
+            <path
+              d={allPathD}
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.35)"
+              strokeWidth="6"
+              strokeDasharray="14 18"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+
+            {/* Path 5: Active Golden Progression Beam */}
             {unlockedPathD && (
               <>
                 <path
                   d={unlockedPathD}
-                  className="road-unlocked-glow"
                   fill="none"
-                  stroke="url(#unlockedPathGrad)"
-                  strokeWidth="12"
+                  stroke="url(#roadProgressionGrad)"
+                  strokeWidth="14"
                   strokeLinecap="round"
-                  filter="url(#pathGlow)"
+                  strokeLinejoin="round"
+                  filter="url(#roadDropShadow)"
                 />
                 <path
                   d={unlockedPathD}
-                  className="road-unlocked-core"
                   fill="none"
                   stroke="#ffffff"
                   strokeWidth="4"
                   strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </>
             )}
           </svg>
 
-          {/* Interactive Level Nodes */}
+          {/* Layer 5: 3D Interactive Level Nodes */}
           {nodes.map((node) => (
             <MapNode
               key={`node-${node.levelNumber}`}
@@ -238,28 +302,52 @@ const AdventureMap = () => {
               status={node.status}
               stars={node.stars}
               milestoneType={node.milestoneType}
+              isClaimed={node.isClaimed}
               x={node.x}
               y={node.y}
               onNodeClick={handleNodeClick}
+              onChestClick={handleChestClick}
             />
           ))}
         </div>
       </div>
 
-      {/* Floating Quick Play Button */}
+      {/* Floating Focus Jump Button */}
+      <button 
+        className="btn-focus-current"
+        onClick={() => scrollToCurrentLevel(true)}
+        title="Focus Current Level"
+      >
+        <Navigation size={20} color="#ffffff" className="focus-icon-tilt" />
+      </button>
+
+      {/* Floating Bottom Quick Play Button */}
       <div className="map-bottom-bar">
         <motion.button 
-          className="btn-quick-play"
+          className="btn-quick-play-hero"
           onClick={() => playLevel(unlockedLevels - 1)}
-          whileHover={{ scale: 1.06 }}
+          whileHover={{ scale: 1.06, y: -2 }}
           whileTap={{ scale: 0.94 }}
           animate={{ scale: [1, 1.04, 1] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
         >
-          <Play size={24} fill="#ffffff" strokeWidth={0} />
+          <Play size={26} fill="#ffffff" strokeWidth={0} />
           <span>PLAY LEVEL {unlockedLevels}</span>
         </motion.button>
       </div>
+
+      {/* Interactive Milestone Chest Claim Modal */}
+      <AnimatePresence>
+        {activeChestModal && (
+          <TreasureChestModal
+            milestoneType={activeChestModal.milestoneType}
+            levelNumber={activeChestModal.levelNumber}
+            isClaimed={activeChestModal.isClaimed}
+            onClaim={handleClaimChest}
+            onClose={() => setActiveChestModal(null)}
+          />
+        )}
+      </AnimatePresence>
 
       <Toast 
         isVisible={toast.isVisible} 

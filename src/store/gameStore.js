@@ -1,19 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { validHandcraftedLevels as levels } from '../levels/levels';
-import { generateLevel } from '../engine/LevelGenerator';
-import { generateBrainArrowLevel } from '../engine/BrainArrowGenerator';
+import { getHandcraftedLevel, ALL_HANDCRAFTED_LEVELS } from '../levels/index';
 
 export const useGameStore = create(
   persist(
     (set, get) => ({
       // Active Game Configuration
-      gameType: 'TIME_ARROW', // 'TIME_ARROW' | 'BRAIN_ARROW'
-      gameMode: 'CLASSIC',    // 'CLASSIC' | 'TIME_ATTACK' | 'CHALLENGE'
+      gameType: 'BRAIN_ARROW', // 'BRAIN_ARROW' | 'TIME_ARROW'
 
       // Player Progress per Game Type
-      timeArrowProgress: { unlockedLevels: 1, currentLevelIndex: 0, levelStars: {} },
-      brainArrowProgress: { unlockedLevels: 1, currentLevelIndex: 0, levelStars: {} },
+      timeArrowProgress: { unlockedLevels: 1, currentLevelIndex: 0, levelStars: {}, claimedChests: {} },
+      brainArrowProgress: { unlockedLevels: 1, currentLevelIndex: 0, levelStars: {}, claimedChests: {} },
 
       coins: 100,
       stars: 0,
@@ -26,10 +23,10 @@ export const useGameStore = create(
       lives: 3,
       maxLives: 3,
       timeRemaining: null,
+      hintsRemaining: 2,
 
       // State Modifiers
       setGameType: (type) => set({ gameType: type }),
-      setGameMode: (mode) => set({ gameMode: mode }),
       setDailyNotification: (sub) => set({ dailyNotificationSubscribed: sub }),
       setTimeRemaining: (time) => set({ timeRemaining: time }),
 
@@ -37,26 +34,49 @@ export const useGameStore = create(
       openMap: () => set({ gameState: 'MAP' }),
       goHome: () => set({ gameState: 'HOME', lives: 3, timeRemaining: null }),
 
-      // Launch a level
-      playLevel: (levelIdx) => {
-        const { gameType, gameMode } = get();
-        let board;
+      // Claim milestone chest reward on adventure map
+      claimChestReward: (levelNum, bonusCoins = 50, bonusStars = 1) => {
+        const { gameType, timeArrowProgress, brainArrowProgress, coins, stars } = get();
+        const isBrain = gameType === 'BRAIN_ARROW';
+        const progress = isBrain ? brainArrowProgress : timeArrowProgress;
 
-        if (gameType === 'BRAIN_ARROW') {
-          board = generateBrainArrowLevel(levelIdx);
-        } else {
-          // TIME_ARROW
-          if (levelIdx < levels.length) {
-            board = JSON.parse(JSON.stringify(levels[levelIdx]));
-            board.id = `level_${levelIdx}_${Date.now()}`;
-          } else {
-            board = generateLevel(levelIdx);
+        const updatedProgress = {
+          ...progress,
+          claimedChests: {
+            ...(progress.claimedChests || {}),
+            [levelNum]: true
           }
-        }
+        };
 
-        // Set life and timer rules based on mode
-        const initialMaxLives = gameMode === 'CHALLENGE' ? 1 : 3;
-        const initialTime = gameMode === 'TIME_ATTACK' ? (board.timeLimit || 60) : null;
+        set({
+          coins: coins + bonusCoins,
+          stars: stars + bonusStars,
+          [isBrain ? 'brainArrowProgress' : 'timeArrowProgress']: updatedProgress
+        });
+      },
+
+      // Launch a level (Difficulty, Timer, Hearts, Hints are governed by the level data)
+      playLevel: (levelIdx) => {
+        const rawLevel = getHandcraftedLevel(levelIdx);
+        const board = JSON.parse(JSON.stringify(rawLevel));
+        board.id = `BAL${board.id || levelIdx + 1}_${Date.now()}`;
+
+        // Automatically assign difficulty based on level ranges if not defined in level file
+        let difficulty = board.difficulty;
+        const lvlNum = levelIdx + 1;
+        if (!difficulty) {
+          if (lvlNum <= 10) difficulty = 'Easy';
+          else if (lvlNum <= 30) difficulty = 'Medium';
+          else if (lvlNum <= 60) difficulty = 'Hard';
+          else if (lvlNum <= 90) difficulty = 'Expert';
+          else difficulty = 'Master';
+        }
+        board.difficulty = difficulty;
+
+        // Level-defined parameters (timer, hearts, hints)
+        const initialMaxLives = board.hearts || 3;
+        const initialTime = board.timer || board.timeLimit || null;
+        const initialHints = board.hints !== undefined ? board.hints : 2;
 
         set({
           currentLevelIndex: levelIdx,
@@ -64,7 +84,8 @@ export const useGameStore = create(
           gameState: 'PLAYING',
           lives: initialMaxLives,
           maxLives: initialMaxLives,
-          timeRemaining: initialTime
+          timeRemaining: initialTime,
+          hintsRemaining: initialHints
         });
       },
 
@@ -90,12 +111,12 @@ export const useGameStore = create(
       },
 
       completeLevel: () => {
-        const { gameType, gameMode, currentLevelIndex, timeArrowProgress, brainArrowProgress, coins, stars } = get();
+        const { gameType, currentLevelIndex, timeArrowProgress, brainArrowProgress, coins, stars } = get();
         const isBrain = gameType === 'BRAIN_ARROW';
         const progress = isBrain ? brainArrowProgress : timeArrowProgress;
 
         const earnedStars = 3;
-        const coinBonus = gameMode === 'CHALLENGE' ? 100 : (gameMode === 'TIME_ATTACK' ? 75 : 50);
+        const coinBonus = 60;
         const newUnlocked = Math.max(progress.unlockedLevels, currentLevelIndex + 2);
 
         const updatedProgress = {
@@ -103,14 +124,14 @@ export const useGameStore = create(
           unlockedLevels: newUnlocked,
           levelStars: {
             ...progress.levelStars,
-            [currentLevelIndex]: Math.max(progress.levelStars[currentLevelIndex] || 0, earnedStars)
+            [currentLevelIndex + 1]: Math.max(progress.levelStars[currentLevelIndex + 1] || 0, earnedStars)
           }
         };
 
         set({
-          gameState: 'VICTORY',
           coins: coins + coinBonus,
           stars: stars + earnedStars,
+          gameState: 'VICTORY',
           [isBrain ? 'brainArrowProgress' : 'timeArrowProgress']: updatedProgress
         });
       },
@@ -118,28 +139,18 @@ export const useGameStore = create(
       nextLevel: () => {
         const nextIdx = get().currentLevelIndex + 1;
         get().playLevel(nextIdx);
-      },
-
-      resetProgress: () => set({ 
-        timeArrowProgress: { unlockedLevels: 1, currentLevelIndex: 0, levelStars: {} },
-        brainArrowProgress: { unlockedLevels: 1, currentLevelIndex: 0, levelStars: {} },
-        coins: 100, 
-        stars: 0, 
-        gameState: 'HOME', 
-        lives: 3 
-      })
+      }
     }),
     {
-      name: 'brainbrush-storage-v2',
-      partialize: (state) => ({ 
+      name: 'brainbrush-arrow-storage',
+      partialize: (state) => ({
         gameType: state.gameType,
-        gameMode: state.gameMode,
         timeArrowProgress: state.timeArrowProgress,
         brainArrowProgress: state.brainArrowProgress,
         coins: state.coins,
         stars: state.stars,
         dailyNotificationSubscribed: state.dailyNotificationSubscribed
-      }),
+      })
     }
   )
 );

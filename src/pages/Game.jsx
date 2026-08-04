@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
-import Grid from '../components/Grid';
-import BrainArrowGrid from '../components/BrainArrowGrid';
+import Board from '../components/Board';
 import VictoryModal from '../components/VictoryModal';
 import DefeatModal from '../components/DefeatModal';
-import { ChevronLeft, Settings, Navigation, Heart, Clock, Zap, Lightbulb, Grid3X3 } from 'lucide-react';
+import { ChevronLeft, Settings, Navigation, Heart, Clock, Lightbulb, RotateCcw, Map } from 'lucide-react';
 import './Game.css';
 
 const Game = () => {
@@ -13,23 +12,21 @@ const Game = () => {
     currentBoard, 
     currentLevelIndex, 
     gameState, 
-    gameType,
-    gameMode,
     lives = 3,
     maxLives = 3,
+    hintsRemaining = 2,
     timeRemaining,
     setTimeRemaining,
     completeLevel, 
     nextLevel,
     loseLife,
     restartLevel,
-    openMap,
-    goHome
+    openMap
   } = useGameStore();
 
-  // Time Attack Countdown Timer
+  // Per-level Countdown Timer (if configured in this level file)
   useEffect(() => {
-    if (gameState !== 'PLAYING' || gameMode !== 'TIME_ATTACK' || timeRemaining === null) return;
+    if (gameState !== 'PLAYING' || timeRemaining === null || timeRemaining === undefined) return;
 
     if (timeRemaining <= 0) {
       useGameStore.setState({ lives: 0, gameState: 'DEFEAT' });
@@ -41,50 +38,54 @@ const Game = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gameState, gameMode, timeRemaining, setTimeRemaining]);
+  }, [gameState, timeRemaining, setTimeRemaining]);
 
   if (!currentBoard) return null;
 
-  const isLowTime = gameMode === 'TIME_ATTACK' && timeRemaining !== null && timeRemaining <= 10;
+  const isLowTime = timeRemaining !== null && timeRemaining !== undefined && timeRemaining <= 10;
+  const difficulty = currentBoard.difficulty || 'Easy';
 
   return (
     <motion.div 
       className={`game-container ${isLowTime ? 'low-time-heartbeat-active' : ''}`}
+      style={{ background: '#ffffff' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Top Header */}
+      {/* Top Floating Header */}
       <header className="game-header">
-        <button className="btn-icon-clear" onClick={openMap}>
-          <ChevronLeft size={32} color="var(--accent-blue)" strokeWidth={2.5} />
+        <button className="btn-icon-pill" onClick={openMap} title="Level Map">
+          <ChevronLeft size={26} color="#0f172a" strokeWidth={2.8} />
         </button>
-        <div className="level-indicator">
-          <h1>Level {currentLevelIndex + 1}</h1>
-          <span className="game-submode-pill">
-            {gameType === 'BRAIN_ARROW' ? '🧠 Brain' : '🕒 Time'} • {gameMode === 'TIME_ATTACK' ? 'Time Attack' : (gameMode === 'CHALLENGE' ? 'Challenge' : 'Classic')}
+        
+        <div className="level-indicator-card">
+          <span className="level-title-label">Level {currentLevelIndex + 1}</span>
+          <span className="game-submode-tag">
+            {difficulty}
           </span>
         </div>
-        <button className="btn-icon-clear">
-          <Settings size={28} color="var(--accent-blue)" strokeWidth={2.5} />
+
+        <button className="btn-icon-pill" title="Settings">
+          <Settings size={22} color="#0f172a" strokeWidth={2.5} />
         </button>
       </header>
 
-      {/* Sub Header (Stats + Timer + Lives) */}
+      {/* Sub Header (Stats + Timer + Lifeline Hearts) */}
       <div className="game-stats-bar">
-        <div className="stat-badge">
-          <Navigation size={18} fill="currentColor" strokeWidth={0} className="icon-flip" /> 
+        <div className="stat-chip">
+          <Navigation size={17} fill="#0f172a" strokeWidth={0} className="icon-flip" /> 
           <span>{currentBoard.arrows?.length || 0}</span>
         </div>
 
-        {/* Time Attack Countdown Pill */}
-        {gameMode === 'TIME_ATTACK' && timeRemaining !== null && (
+        {/* Level Timer Pill (Shown only when level has timer configured) */}
+        {timeRemaining !== null && timeRemaining !== undefined && (
           <motion.div 
             className={`timer-pill ${isLowTime ? 'timer-low-pulse' : ''}`}
             animate={isLowTime ? { scale: [1, 1.12, 1] } : {}}
             transition={{ repeat: Infinity, duration: 0.6 }}
           >
-            <Clock size={16} color={isLowTime ? "#ef4444" : "#f59e0b"} strokeWidth={2.5} />
+            <Clock size={16} color={isLowTime ? "#ef4444" : "#d97706"} strokeWidth={2.5} />
             <span className="timer-number">{timeRemaining}s</span>
           </motion.div>
         )}
@@ -97,12 +98,12 @@ const Game = () => {
               <motion.div
                 key={`heart-${i}`}
                 initial={false}
-                animate={isAlive ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0.35 }}
+                animate={isAlive ? { scale: 1, opacity: 1 } : { scale: 0.75, opacity: 0.3 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                 className={`heart-wrapper ${!isAlive ? 'heart-lost' : ''}`}
               >
                 <Heart 
-                  fill={isAlive ? "#ef4444" : "#94a3b8"} 
+                  fill={isAlive ? "#ef4444" : "#cbd5e1"} 
                   color={isAlive ? "#ef4444" : "#94a3b8"} 
                   size={24} 
                 />
@@ -110,29 +111,16 @@ const Game = () => {
             );
           })}
         </div>
-        
-        <div className="difficulty-badge">
-          {currentBoard.difficultyLabel || 'Normal'}
-        </div>
       </div>
       
-      {/* Main Board Area (Renders Grid for Time Arrow or BrainArrowGrid for Brain Arrow) */}
+      {/* Modular SVG Board Area */}
       <main className="game-area">
-        {gameType === 'BRAIN_ARROW' ? (
-          <BrainArrowGrid 
-            key={`brain_${currentBoard.id}_${currentLevelIndex}`}
-            levelData={currentBoard}
-            onLevelComplete={completeLevel}
-            onWrongMove={loseLife}
-          />
-        ) : (
-          <Grid 
-            key={`time_${currentBoard.id}_${currentLevelIndex}`} 
-            levelData={currentBoard} 
-            onLevelComplete={completeLevel}
-            onWrongMove={loseLife}
-          />
-        )}
+        <Board 
+          key={`board_${currentBoard.id}_${currentLevelIndex}`}
+          data={currentBoard}
+          onLevelComplete={completeLevel}
+          onWrongMove={loseLife}
+        />
 
         {gameState === 'VICTORY' && (
           <VictoryModal onNext={nextLevel} />
@@ -143,14 +131,17 @@ const Game = () => {
         )}
       </main>
 
-      {/* Bottom Floating Action Buttons */}
-      <div className="bottom-actions">
-        <button className="btn-fab" title="Hint">
-          <Lightbulb size={28} color="var(--accent-blue)" strokeWidth={2} />
-          <div className="fab-badge">2</div>
+      {/* Bottom Floating Power-Up Dock */}
+      <div className="bottom-actions-dock">
+        <button className="btn-dock-item" title="Hint">
+          <Lightbulb size={24} color="#0f172a" strokeWidth={2.5} />
+          <div className="dock-badge">{hintsRemaining}</div>
         </button>
-        <button className="btn-fab" onClick={restartLevel} title="Restart Level">
-          <Grid3X3 size={28} color="var(--accent-blue)" strokeWidth={2} />
+        <button className="btn-dock-item" onClick={restartLevel} title="Restart Level">
+          <RotateCcw size={22} color="#0f172a" strokeWidth={2.5} />
+        </button>
+        <button className="btn-dock-item" onClick={openMap} title="Adventure Map">
+          <Map size={22} color="#0f172a" strokeWidth={2.5} />
         </button>
       </div>
     </motion.div>
