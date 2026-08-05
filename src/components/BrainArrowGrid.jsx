@@ -218,7 +218,7 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
         });
 
         setFlyingIds(prev => prev.filter(id => id !== arrow.id));
-      }, 450);
+      }, 3400);
     } else {
       if (navigator.vibrate) navigator.vibrate([35, 25, 35]);
       setBlockedId(arrow.id);
@@ -421,8 +421,8 @@ const BrainArrowGrid = ({ levelData, onLevelComplete, onWrongMove }) => {
                       ? {
                           x: exitDeltaX,
                           y: exitDeltaY,
-                          opacity: [1, 1, 0],
-                          transition: { duration: 0.42, ease: [0.32, 0, 0.24, 1] }
+                          opacity: [1, 1, 1, 0.9, 0],
+                          transition: { duration: 3.2, ease: [0.25, 0.9, 0.3, 1] }
                         }
                       : (isBlocked
                           ? {

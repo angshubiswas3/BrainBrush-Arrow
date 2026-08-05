@@ -115,6 +115,14 @@
   touch-action: manipulation;
 }
 
+.modular-piece-tile::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  cursor: pointer;
+  z-index: 2;
+}
+
 .modular-piece-tile svg {
   pointer-events: none;
 }

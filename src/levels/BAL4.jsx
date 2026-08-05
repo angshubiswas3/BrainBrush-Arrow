@@ -2,154 +2,357 @@ export default {
   "id": 4,
   "name": "Level 4",
   "difficulty": "Easy",
-  "moves": 3,
-  "gridSize": 4,
-  "occupancy": "69%",
-  "board": [
+  "moves": 5,
+  "size": {
+    "rows": 8,
+    "cols": 8
+  },
+  "gridSize": 8,
+  "occupancy": "90%",
+  "arrows": [
     {
       "id": "a1",
-      "direction": "RIGHT",
+      "direction": "UP",
       "color": "#0f172a",
       "vertices": [
-        {
-          "r": 1,
-          "c": 3
-        },
-        {
-          "r": 2,
-          "c": 3
-        },
-        {
-          "r": 2,
-          "c": 2
-        },
-        {
-          "r": 2,
-          "c": 1
-        },
-        {
-          "r": 1,
-          "c": 1
-        }
+        { "r": 6, "c": 0 },
+        { "r": 7, "c": 0 },
+        { "r": 7, "c": 1 },
+        { "r": 7, "c": 2 },
+        { "r": 7, "c": 3 },
+        { "r": 7, "c": 4 },
+        { "r": 7, "c": 5 },
+        { "r": 7, "c": 6 },
+        { "r": 7, "c": 7 },
+        { "r": 6, "c": 7 },
+        { "r": 5, "c": 7 },
+        { "r": 4, "c": 7 },
+        { "r": 3, "c": 7 },
+        { "r": 2, "c": 7 },
+        { "r": 1, "c": 7 },
+        { "r": 0, "c": 7 },
+        { "r": 0, "c": 6 },
+        { "r": 0, "c": 5 },
+        { "r": 0, "c": 4 },
+        { "r": 1, "c": 4 },
+        { "r": 2, "c": 4 },
+        { "r": 3, "c": 4 },
+        { "r": 4, "c": 4 },
+        { "r": 4, "c": 3 },
+        { "r": 3, "c": 3 },
+        { "r": 2, "c": 3 },
+        { "r": 1, "c": 3 },
+        { "r": 0, "c": 3 }
       ],
       "pieces": [
-        {
-          "r": 1,
-          "c": 3,
-          "type": "DEAD_END",
-          "rotation": 90
-        },
-        {
-          "r": 2,
-          "c": 3,
-          "type": "CORNER",
-          "rotation": 0
-        },
-        {
-          "r": 2,
-          "c": 2,
-          "type": "STRAIGHT",
-          "rotation": 0
-        },
-        {
-          "r": 2,
-          "c": 1,
-          "type": "CORNER",
-          "rotation": 90
-        },
-        {
-          "r": 1,
-          "c": 1,
-          "type": "ARROW_HEAD",
-          "rotation": 0,
-          "short": false
-        }
+        { "r": 6, "c": 0, "type": "DEAD_END", "rotation": 90 },
+        { "r": 7, "c": 0, "type": "CORNER", "rotation": 90 },
+        { "r": 7, "c": 1, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 2, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 3, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 4, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 5, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 6, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 7, "type": "CORNER", "rotation": 0 },
+        { "r": 6, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 5, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 4, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 1, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 0, "c": 7, "type": "CORNER", "rotation": 270 },
+        { "r": 0, "c": 6, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 0, "c": 5, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 0, "c": 4, "type": "CORNER", "rotation": 180 },
+        { "r": 1, "c": 4, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 4, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 4, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 4, "c": 4, "type": "CORNER", "rotation": 0 },
+        { "r": 4, "c": 3, "type": "CORNER", "rotation": 90 },
+        { "r": 3, "c": 3, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 3, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 1, "c": 3, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 0, "c": 3, "type": "ARROW_HEAD", "rotation": 270, "short": false }
       ]
     },
     {
       "id": "a2",
-      "direction": "UP",
+      "direction": "RIGHT",
       "color": "#0f172a",
       "vertices": [
-        {
-          "r": 1,
-          "c": 2
-        },
-        {
-          "r": 0,
-          "c": 2
-        },
-        {
-          "r": 0,
-          "c": 3
-        }
+        { "r": 4, "c": 1 },
+        { "r": 3, "c": 1 },
+        { "r": 2, "c": 1 },
+        { "r": 2, "c": 2 }
       ],
       "pieces": [
-        {
-          "r": 1,
-          "c": 2,
-          "type": "DEAD_END",
-          "rotation": 270
-        },
-        {
-          "r": 0,
-          "c": 2,
-          "type": "CORNER",
-          "rotation": 180
-        },
-        {
-          "r": 0,
-          "c": 3,
-          "type": "ARROW_HEAD",
-          "rotation": 270,
-          "short": false
-        }
+        { "r": 4, "c": 1, "type": "DEAD_END", "rotation": 270 },
+        { "r": 3, "c": 1, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 1, "type": "CORNER", "rotation": 180 },
+        { "r": 2, "c": 2, "type": "ARROW_HEAD", "rotation": 0, "short": false }
       ]
     },
     {
       "id": "a3",
-      "direction": "LEFT",
+      "direction": "RIGHT",
       "color": "#0f172a",
       "vertices": [
-        {
-          "r": 3,
-          "c": 3
-        },
-        {
-          "r": 3,
-          "c": 2
-        },
-        {
-          "r": 3,
-          "c": 1
-        }
+        { "r": 1, "c": 2 },
+        { "r": 1, "c": 1 },
+        { "r": 0, "c": 1 },
+        { "r": 0, "c": 0 },
+        { "r": 1, "c": 0 },
+        { "r": 2, "c": 0 },
+        { "r": 3, "c": 0 },
+        { "r": 4, "c": 0 },
+        { "r": 5, "c": 0 },
+        { "r": 5, "c": 1 },
+        { "r": 6, "c": 1 },
+        { "r": 6, "c": 2 },
+        { "r": 6, "c": 3 },
+        { "r": 6, "c": 4 },
+        { "r": 6, "c": 5 },
+        { "r": 6, "c": 6 }
       ],
       "pieces": [
-        {
-          "r": 3,
-          "c": 3,
-          "type": "DEAD_END",
-          "rotation": 180
-        },
-        {
-          "r": 3,
-          "c": 2,
-          "type": "STRAIGHT",
-          "rotation": 0
-        },
-        {
-          "r": 3,
-          "c": 1,
-          "type": "ARROW_HEAD",
-          "rotation": 180,
-          "short": false
-        }
+        { "r": 1, "c": 2, "type": "DEAD_END", "rotation": 180 },
+        { "r": 1, "c": 1, "type": "CORNER", "rotation": 90 },
+        { "r": 0, "c": 1, "type": "CORNER", "rotation": 270 },
+        { "r": 0, "c": 0, "type": "CORNER", "rotation": 180 },
+        { "r": 1, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 4, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 5, "c": 0, "type": "CORNER", "rotation": 90 },
+        { "r": 5, "c": 1, "type": "CORNER", "rotation": 270 },
+        { "r": 6, "c": 1, "type": "CORNER", "rotation": 90 },
+        { "r": 6, "c": 2, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 3, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 4, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 5, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 6, "type": "ARROW_HEAD", "rotation": 0, "short": false }
+      ]
+    },
+    {
+      "id": "a4",
+      "direction": "UP",
+      "color": "#0f172a",
+      "vertices": [
+        { "r": 3, "c": 2 },
+        { "r": 4, "c": 2 },
+        { "r": 5, "c": 2 },
+        { "r": 5, "c": 3 },
+        { "r": 5, "c": 4 },
+        { "r": 5, "c": 5 },
+        { "r": 4, "c": 5 },
+        { "r": 3, "c": 5 }
+      ],
+      "pieces": [
+        { "r": 3, "c": 2, "type": "DEAD_END", "rotation": 90 },
+        { "r": 4, "c": 2, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 5, "c": 2, "type": "CORNER", "rotation": 90 },
+        { "r": 5, "c": 3, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 5, "c": 4, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 5, "c": 5, "type": "CORNER", "rotation": 0 },
+        { "r": 4, "c": 5, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 5, "type": "ARROW_HEAD", "rotation": 270, "short": false }
+      ]
+    },
+    {
+      "id": "a5",
+      "direction": "RIGHT",
+      "color": "#0f172a",
+      "vertices": [
+        { "r": 5, "c": 6 },
+        { "r": 4, "c": 6 },
+        { "r": 3, "c": 6 },
+        { "r": 2, "c": 6 },
+        { "r": 2, "c": 5 },
+        { "r": 1, "c": 5 },
+        { "r": 1, "c": 6 }
+      ],
+      "pieces": [
+        { "r": 5, "c": 6, "type": "DEAD_END", "rotation": 270 },
+        { "r": 4, "c": 6, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 6, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 6, "type": "CORNER", "rotation": 270 },
+        { "r": 2, "c": 5, "type": "CORNER", "rotation": 90 },
+        { "r": 1, "c": 5, "type": "CORNER", "rotation": 180 },
+        { "r": 1, "c": 6, "type": "ARROW_HEAD", "rotation": 0, "short": false }
       ]
     }
   ],
-  "solution": [
-    "a3",
-    "a2",
-    "a1"
+  "board": [
+    {
+      "id": "a1",
+      "direction": "UP",
+      "color": "#0f172a",
+      "vertices": [
+        { "r": 6, "c": 0 },
+        { "r": 7, "c": 0 },
+        { "r": 7, "c": 1 },
+        { "r": 7, "c": 2 },
+        { "r": 7, "c": 3 },
+        { "r": 7, "c": 4 },
+        { "r": 7, "c": 5 },
+        { "r": 7, "c": 6 },
+        { "r": 7, "c": 7 },
+        { "r": 6, "c": 7 },
+        { "r": 5, "c": 7 },
+        { "r": 4, "c": 7 },
+        { "r": 3, "c": 7 },
+        { "r": 2, "c": 7 },
+        { "r": 1, "c": 7 },
+        { "r": 0, "c": 7 },
+        { "r": 0, "c": 6 },
+        { "r": 0, "c": 5 },
+        { "r": 0, "c": 4 },
+        { "r": 1, "c": 4 },
+        { "r": 2, "c": 4 },
+        { "r": 3, "c": 4 },
+        { "r": 4, "c": 4 },
+        { "r": 4, "c": 3 },
+        { "r": 3, "c": 3 },
+        { "r": 2, "c": 3 },
+        { "r": 1, "c": 3 },
+        { "r": 0, "c": 3 }
+      ],
+      "pieces": [
+        { "r": 6, "c": 0, "type": "DEAD_END", "rotation": 90 },
+        { "r": 7, "c": 0, "type": "CORNER", "rotation": 90 },
+        { "r": 7, "c": 1, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 2, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 3, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 4, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 5, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 6, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 7, "c": 7, "type": "CORNER", "rotation": 0 },
+        { "r": 6, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 5, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 4, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 1, "c": 7, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 0, "c": 7, "type": "CORNER", "rotation": 270 },
+        { "r": 0, "c": 6, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 0, "c": 5, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 0, "c": 4, "type": "CORNER", "rotation": 180 },
+        { "r": 1, "c": 4, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 4, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 4, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 4, "c": 4, "type": "CORNER", "rotation": 0 },
+        { "r": 4, "c": 3, "type": "CORNER", "rotation": 90 },
+        { "r": 3, "c": 3, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 3, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 1, "c": 3, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 0, "c": 3, "type": "ARROW_HEAD", "rotation": 270, "short": false }
+      ]
+    },
+    {
+      "id": "a2",
+      "direction": "RIGHT",
+      "color": "#0f172a",
+      "vertices": [
+        { "r": 4, "c": 1 },
+        { "r": 3, "c": 1 },
+        { "r": 2, "c": 1 },
+        { "r": 2, "c": 2 }
+      ],
+      "pieces": [
+        { "r": 4, "c": 1, "type": "DEAD_END", "rotation": 270 },
+        { "r": 3, "c": 1, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 1, "type": "CORNER", "rotation": 180 },
+        { "r": 2, "c": 2, "type": "ARROW_HEAD", "rotation": 0, "short": false }
+      ]
+    },
+    {
+      "id": "a3",
+      "direction": "RIGHT",
+      "color": "#0f172a",
+      "vertices": [
+        { "r": 1, "c": 2 },
+        { "r": 1, "c": 1 },
+        { "r": 0, "c": 1 },
+        { "r": 0, "c": 0 },
+        { "r": 1, "c": 0 },
+        { "r": 2, "c": 0 },
+        { "r": 3, "c": 0 },
+        { "r": 4, "c": 0 },
+        { "r": 5, "c": 0 },
+        { "r": 5, "c": 1 },
+        { "r": 6, "c": 1 },
+        { "r": 6, "c": 2 },
+        { "r": 6, "c": 3 },
+        { "r": 6, "c": 4 },
+        { "r": 6, "c": 5 },
+        { "r": 6, "c": 6 }
+      ],
+      "pieces": [
+        { "r": 1, "c": 2, "type": "DEAD_END", "rotation": 180 },
+        { "r": 1, "c": 1, "type": "CORNER", "rotation": 90 },
+        { "r": 0, "c": 1, "type": "CORNER", "rotation": 270 },
+        { "r": 0, "c": 0, "type": "CORNER", "rotation": 180 },
+        { "r": 1, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 4, "c": 0, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 5, "c": 0, "type": "CORNER", "rotation": 90 },
+        { "r": 5, "c": 1, "type": "CORNER", "rotation": 270 },
+        { "r": 6, "c": 1, "type": "CORNER", "rotation": 90 },
+        { "r": 6, "c": 2, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 3, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 4, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 5, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 6, "c": 6, "type": "ARROW_HEAD", "rotation": 0, "short": false }
+      ]
+    },
+    {
+      "id": "a4",
+      "direction": "UP",
+      "color": "#0f172a",
+      "vertices": [
+        { "r": 3, "c": 2 },
+        { "r": 4, "c": 2 },
+        { "r": 5, "c": 2 },
+        { "r": 5, "c": 3 },
+        { "r": 5, "c": 4 },
+        { "r": 5, "c": 5 },
+        { "r": 4, "c": 5 },
+        { "r": 3, "c": 5 }
+      ],
+      "pieces": [
+        { "r": 3, "c": 2, "type": "DEAD_END", "rotation": 90 },
+        { "r": 4, "c": 2, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 5, "c": 2, "type": "CORNER", "rotation": 90 },
+        { "r": 5, "c": 3, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 5, "c": 4, "type": "STRAIGHT", "rotation": 0 },
+        { "r": 5, "c": 5, "type": "CORNER", "rotation": 0 },
+        { "r": 4, "c": 5, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 5, "type": "ARROW_HEAD", "rotation": 270, "short": false }
+      ]
+    },
+    {
+      "id": "a5",
+      "direction": "RIGHT",
+      "color": "#0f172a",
+      "vertices": [
+        { "r": 5, "c": 6 },
+        { "r": 4, "c": 6 },
+        { "r": 3, "c": 6 },
+        { "r": 2, "c": 6 },
+        { "r": 2, "c": 5 },
+        { "r": 1, "c": 5 },
+        { "r": 1, "c": 6 }
+      ],
+      "pieces": [
+        { "r": 5, "c": 6, "type": "DEAD_END", "rotation": 270 },
+        { "r": 4, "c": 6, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 3, "c": 6, "type": "STRAIGHT", "rotation": 90 },
+        { "r": 2, "c": 6, "type": "CORNER", "rotation": 270 },
+        { "r": 2, "c": 5, "type": "CORNER", "rotation": 90 },
+        { "r": 1, "c": 5, "type": "CORNER", "rotation": 180 },
+        { "r": 1, "c": 6, "type": "ARROW_HEAD", "rotation": 0, "short": false }
+      ]
+    }
   ]
 };

@@ -105,19 +105,29 @@ export function computePiecesFromVertices(vertices, headDir) {
  * Verifies if an arrow has a clean, unobstructed exit path in direction 'dir'.
  */
 export function isArrowClearOnGrid(arrow, allArrows, size) {
-  const head = arrow.vertices[arrow.vertices.length - 1];
+  if (!arrow) return false;
+  
+  const headPiece = arrow.pieces?.find(p => p.type === 'ARROW_HEAD');
+  const head = headPiece || (arrow.vertices ? arrow.vertices[arrow.vertices.length - 1] : null);
+  if (!head) return true;
+
   const delta = DELTAS[arrow.direction];
-  const rows = size.rows || size;
-  const cols = size.cols || size;
+  if (!delta) return true;
+
+  const rows = size?.rows || (typeof size === 'number' ? size : 6);
+  const cols = size?.cols || (typeof size === 'number' ? size : 6);
 
   let cr = head.r + delta.r;
   let cc = head.c + delta.c;
 
   while (cr >= 0 && cr < rows && cc >= 0 && cc < cols) {
-    const hitOther = allArrows.some(other =>
-      other.id !== arrow.id &&
-      other.vertices.some(v => v.r === cr && v.c === cc)
-    );
+    const hitOther = allArrows.some(other => {
+      if (other.id === arrow.id) return false;
+      const pieceHit = other.pieces && other.pieces.some(p => p.r === cr && p.c === cc);
+      const vertexHit = other.vertices && other.vertices.some(v => v.r === cr && v.c === cc);
+      return pieceHit || vertexHit;
+    });
+
     if (hitOther) return false;
     cr += delta.r;
     cc += delta.c;

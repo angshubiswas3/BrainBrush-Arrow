@@ -20,6 +20,67 @@ const DELTA_OFFSETS = {
   RIGHT: { r: 0, c: 1 }
 };
 
+const DIRECTION_ROTATIONS = {
+  RIGHT: 0,
+  DOWN: 90,
+  LEFT: 180,
+  UP: 270
+};
+
+/**
+ * Builds continuous SVG polyline path for smooth slithering exit animation.
+ */
+function buildArrowSvgPath(arrow, tileSize, exitDistance = 600) {
+  let vertices = arrow.vertices;
+  if (!vertices || vertices.length === 0) {
+    if (arrow.pieces && arrow.pieces.length > 0) {
+      vertices = arrow.pieces.map(p => ({ r: p.r, c: p.c }));
+    } else {
+      vertices = [];
+    }
+  }
+
+  if (vertices.length === 0) {
+    return { pathD: '', arrowLength: 0, totalLength: 0, headX: 0, headY: 0, dir: { r: 0, c: 1 } };
+  }
+
+  const points = vertices.map(v => ({
+    x: v.c * tileSize + tileSize / 2,
+    y: v.r * tileSize + tileSize / 2
+  }));
+
+  let arrowLength = 0;
+  for (let i = 0; i < points.length - 1; i++) {
+    const dx = points[i + 1].x - points[i].x;
+    const dy = points[i + 1].y - points[i].y;
+    arrowLength += Math.hypot(dx, dy);
+  }
+
+  const dir = DELTA_OFFSETS[arrow.direction] || DELTA_OFFSETS.RIGHT;
+  const head = points[points.length - 1];
+  const exitPoint = {
+    x: head.x + dir.c * exitDistance,
+    y: head.y + dir.r * exitDistance
+  };
+
+  const allPoints = [...points, exitPoint];
+  let pathD = `M ${allPoints[0].x} ${allPoints[0].y}`;
+  for (let i = 1; i < allPoints.length; i++) {
+    pathD += ` L ${allPoints[i].x} ${allPoints[i].y}`;
+  }
+
+  const totalLength = arrowLength + exitDistance;
+
+  return {
+    pathD,
+    arrowLength,
+    totalLength,
+    headX: head.x,
+    headY: head.y,
+    dir
+  };
+}
+
 const Board = ({ 
   data, 
   onLevelComplete, 
@@ -28,13 +89,11 @@ const Board = ({
 }) => {
   const levelData = data || {};
   const initialArrows = levelData.board || levelData.arrows || [];
-  const [arrows, setArrows] = useState(initialArrows);
+  const [arrows, setArrows] = useState([]);
+  const [flyingArrows, setFlyingArrows] = useState([]);
   const [blockedId, setBlockedId] = useState(null);
-  const [flyingIds, setFlyingIds] = useState([]);
   const [sparkles, setSparkles] = useState([]);
   const [combo, setCombo] = useState(0);
-
-  // Zoom and Pan Controls
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
 
@@ -47,12 +106,12 @@ const Board = ({
   const cols = levelData.size?.cols || gridSize;
   const maxDim = Math.max(rows, cols);
 
-  // Compact, sleek tile size (e.g. 36px to 52px)
-  const TILE_SIZE = Math.min(52, Math.max(34, Math.floor(250 / maxDim)));
+  // Compact, snug tile size so arrows are tightly packed without large gaps
+  const TILE_SIZE = Math.min(30, Math.max(24, Math.floor(220 / maxDim)));
   const BOARD_WIDTH = cols * TILE_SIZE;
   const BOARD_HEIGHT = rows * TILE_SIZE;
-  const STROKE_WIDTH = 8; // Sleek, modern vector line stroke
-  const EXIT_DISTANCE = 600;
+  const STROKE_WIDTH = 9; // Sleek, crisp vector line stroke
+  const EXIT_DISTANCE = 650;
 
   const theme = levelData.theme || { color: '#0f172a', bg: '#f8fafc' };
 
@@ -60,7 +119,7 @@ const Board = ({
   useEffect(() => {
     const freshArrows = levelData.board || levelData.arrows || [];
     setArrows(freshArrows);
-    setFlyingIds([]);
+    setFlyingArrows([]);
     setBlockedId(null);
     setScale(1);
     setPan({ x: 0, y: 0 });
@@ -70,18 +129,17 @@ const Board = ({
   // Level completion check
   useEffect(() => {
     const totalCount = (levelData.board?.length || levelData.arrows?.length || 0);
-    if (arrows.length === 0 && totalCount > 0 && flyingIds.length === 0) {
+    if (arrows.length === 0 && flyingArrows.length === 0 && totalCount > 0) {
       if (navigator.vibrate) navigator.vibrate([30, 40, 60, 40, 100]);
       const timer = setTimeout(() => {
         if (onLevelComplete) onLevelComplete();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [arrows.length, levelData, flyingIds.length, onLevelComplete]);
+  }, [arrows.length, flyingArrows.length, levelData, onLevelComplete]);
 
   const handleArrowClick = (arrow) => {
-    if (flyingIds.includes(arrow.id)) return;
-
+    // Check unobstructed path against remaining active obstacles
     const isClear = isArrowClearOnGrid(arrow, arrows, { rows, cols });
 
     if (isClear) {
@@ -89,7 +147,7 @@ const Board = ({
 
       setCombo(c => c + 1);
       clearTimeout(comboTimerRef.current);
-      comboTimerRef.current = setTimeout(() => setCombo(0), 1800);
+      comboTimerRef.current = setTimeout(() => setCombo(0), 2200);
 
       // Find arrow head tile for sparkle burst
       const headPiece = arrow.pieces.find(p => p.type === 'ARROW_HEAD') || arrow.pieces[arrow.pieces.length - 1];
@@ -104,15 +162,16 @@ const Board = ({
         setSparkles(prev => [...prev, newSparkle]);
         setTimeout(() => {
           setSparkles(prev => prev.filter(s => s.id !== newSparkle.id));
-        }, 600);
+        }, 1000);
       }
 
-      setFlyingIds(prev => [...prev, arrow.id]);
+      // IMMEDIATELY remove from obstacle grid so subsequent taps NEVER falsely block
+      setArrows(prev => prev.filter(a => a.id !== arrow.id));
+      setFlyingArrows(prev => [...prev, arrow]);
 
       setTimeout(() => {
-        setArrows(prev => prev.filter(a => a.id !== arrow.id));
-        setFlyingIds(prev => prev.filter(id => id !== arrow.id));
-      }, 420);
+        setFlyingArrows(prev => prev.filter(a => a.id !== arrow.id));
+      }, 3400);
     } else {
       if (navigator.vibrate) navigator.vibrate([35, 25, 35]);
       setBlockedId(arrow.id);
@@ -191,7 +250,7 @@ const Board = ({
         )}
       </AnimatePresence>
 
-      {/* Main Board Stage (Direct Artwork Render - No Card/Box) */}
+      {/* Main Board Stage */}
       <div 
         className="modular-board-stage"
         style={{
@@ -232,15 +291,77 @@ const Board = ({
             ))
           ))}
 
-          {/* Modular SVG Puzzle Arrows */}
+          {/* In-Flight Slithering Path Animations */}
+          {flyingArrows.map((arrow) => {
+            const pathData = buildArrowSvgPath(arrow, TILE_SIZE, EXIT_DISTANCE);
+            const rotation = DIRECTION_ROTATIONS[arrow.direction] || 0;
+            const arrowColor = arrow.color || theme.color || '#0f172a';
+
+            return (
+              <React.Fragment key={`flying-group-${arrow.id}`}>
+                {/* Slithering Body Path */}
+                <svg
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: `${BOARD_WIDTH}px`,
+                    height: `${BOARD_HEIGHT}px`,
+                    overflow: 'visible',
+                    pointerEvents: 'none',
+                    zIndex: 25
+                  }}
+                >
+                  <motion.path
+                    d={pathData.pathD}
+                    fill="none"
+                    stroke={arrowColor}
+                    strokeWidth={STROKE_WIDTH}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray={`${pathData.arrowLength} ${pathData.totalLength * 2}`}
+                    initial={{ strokeDashoffset: 0, opacity: 1 }}
+                    animate={{ 
+                      strokeDashoffset: -pathData.totalLength,
+                      opacity: [1, 1, 1, 0.9, 0]
+                    }}
+                    transition={{ duration: 3.2, ease: [0.25, 0.9, 0.3, 1] }}
+                  />
+                </svg>
+
+                {/* Leading Arrowhead Flying Out */}
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    left: `${pathData.headX - TILE_SIZE / 2}px`,
+                    top: `${pathData.headY - TILE_SIZE / 2}px`,
+                    width: `${TILE_SIZE}px`,
+                    height: `${TILE_SIZE}px`,
+                    pointerEvents: 'none',
+                    zIndex: 30
+                  }}
+                  initial={{ x: 0, y: 0, opacity: 1 }}
+                  animate={{
+                    x: pathData.dir.c * EXIT_DISTANCE,
+                    y: pathData.dir.r * EXIT_DISTANCE,
+                    opacity: [1, 1, 1, 0.85, 0]
+                  }}
+                  transition={{ duration: 3.2, ease: [0.25, 0.9, 0.3, 1] }}
+                >
+                  <ArrowHead
+                    color={arrowColor}
+                    strokeWidth={STROKE_WIDTH}
+                    rotation={rotation}
+                    short={false}
+                  />
+                </motion.div>
+              </React.Fragment>
+            );
+          })}
+
+          {/* Active Obstacle Arrows on Grid */}
           {arrows.map((arrow) => {
             const isBlocked = arrow.id === blockedId;
-            const isFlying = flyingIds.includes(arrow.id);
-            const delta = DELTA_OFFSETS[arrow.direction] || DELTA_OFFSETS.RIGHT;
-
-            const exitDeltaX = delta.c * EXIT_DISTANCE;
-            const exitDeltaY = delta.r * EXIT_DISTANCE;
-
             const arrowColor = isBlocked ? '#ef4444' : (arrow.color || theme.color || '#0f172a');
 
             return (
@@ -249,27 +370,19 @@ const Board = ({
                 className={`modular-arrow-container ${isBlocked ? 'arrow-blocked-shake' : ''}`}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={
-                  isFlying
+                  isBlocked
                     ? {
-                        x: exitDeltaX,
-                        y: exitDeltaY,
-                        opacity: [1, 1, 0],
-                        transition: { duration: 0.42, ease: [0.32, 0, 0.24, 1] }
+                        x: [-6, 6, -6, 6, 0],
+                        opacity: 1,
+                        transition: { duration: 0.35 }
                       }
-                    : (isBlocked
-                        ? {
-                            x: [-6, 6, -6, 6, 0],
-                            opacity: 1,
-                            transition: { duration: 0.35 }
-                          }
-                        : {
-                            x: 0,
-                            y: 0,
-                            opacity: 1,
-                            scale: 1,
-                            transition: { duration: 0.2 }
-                          }
-                      )
+                    : {
+                        x: 0,
+                        y: 0,
+                        opacity: 1,
+                        scale: 1,
+                        transition: { duration: 0.2 }
+                      }
                 }
               >
                 {arrow.pieces.map((piece, pIdx) => {

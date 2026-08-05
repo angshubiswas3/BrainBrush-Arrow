@@ -238,6 +238,268 @@ function createHandcraftedBALLevel(levelNum) {
           ]
         }
       ]
+  // Level 3: Handcrafted 4-arrow puzzle (Exact match to user design)
+  if (levelNum === 3) {
+    return {
+      id: 3,
+      name: `Level 3`,
+      size: { rows: 4, cols: 4 },
+      difficulty: 'Easy',
+      moveCount: 4,
+      solution: ['a1', 'a2', 'a3', 'a4'],
+      arrows: [
+        {
+          id: 'a1',
+          direction: 'LEFT',
+          color: theme.color,
+          vertices: [
+            { r: 0, c: 3 },
+            { r: 0, c: 2 },
+            { r: 0, c: 1 }
+          ],
+          pieces: [
+            { r: 0, c: 3, type: 'DEAD_END', rotation: 180 },
+            { r: 0, c: 2, type: 'STRAIGHT', rotation: 0 },
+            { r: 0, c: 1, type: 'ARROW_HEAD', rotation: 180, short: false }
+          ]
+        },
+        {
+          id: 'a2',
+          direction: 'DOWN',
+          color: theme.color,
+          vertices: [
+            { r: 1, c: 1 },
+            { r: 1, c: 0 },
+            { r: 2, c: 0 },
+            { r: 3, c: 0 }
+          ],
+          pieces: [
+            { r: 1, c: 1, type: 'DEAD_END', rotation: 180 },
+            { r: 1, c: 0, type: 'CORNER', rotation: 180 },
+            { r: 2, c: 0, type: 'STRAIGHT', rotation: 90 },
+            { r: 3, c: 0, type: 'ARROW_HEAD', rotation: 90, short: false }
+          ]
+        },
+        {
+          id: 'a3',
+          direction: 'UP',
+          color: theme.color,
+          vertices: [
+            { r: 2, c: 3 },
+            { r: 3, c: 3 },
+            { r: 3, c: 2 },
+            { r: 3, c: 1 },
+            { r: 2, c: 1 }
+          ],
+          pieces: [
+            { r: 2, c: 3, type: 'DEAD_END', rotation: 90 },
+            { r: 3, c: 3, type: 'CORNER', rotation: 0 },
+            { r: 3, c: 2, type: 'STRAIGHT', rotation: 0 },
+            { r: 3, c: 1, type: 'CORNER', rotation: 90 },
+            { r: 2, c: 1, type: 'ARROW_HEAD', rotation: 270, short: false }
+          ]
+        },
+        {
+          id: 'a4',
+          direction: 'DOWN',
+          color: theme.color,
+          vertices: [
+            { r: 1, c: 3 },
+            { r: 1, c: 2 },
+            { r: 2, c: 2 }
+          ],
+          pieces: [
+            { r: 1, c: 3, type: 'DEAD_END', rotation: 180 },
+            { r: 1, c: 2, type: 'CORNER', rotation: 180 },
+            { r: 2, c: 2, type: 'ARROW_HEAD', rotation: 90, short: false }
+          ]
+        }
+      ]
+    };
+  }
+
+  // Level 4: Handcrafted 5-arrow maze puzzle (100% exact match to reference image)
+  if (levelNum === 4) {
+    return {
+      id: 4,
+      name: `Level 4`,
+      size: { rows: 8, cols: 8 },
+      difficulty: 'Easy',
+      moveCount: 5,
+      solution: ['a1', 'a5', 'a4', 'a2', 'a3'],
+      arrows: [
+        {
+          id: 'a1',
+          direction: 'UP',
+          color: theme.color,
+          vertices: [
+            { r: 6, c: 0 },
+            { r: 7, c: 0 },
+            { r: 7, c: 1 },
+            { r: 7, c: 2 },
+            { r: 7, c: 3 },
+            { r: 7, c: 4 },
+            { r: 7, c: 5 },
+            { r: 7, c: 6 },
+            { r: 7, c: 7 },
+            { r: 6, c: 7 },
+            { r: 5, c: 7 },
+            { r: 4, c: 7 },
+            { r: 3, c: 7 },
+            { r: 2, c: 7 },
+            { r: 1, c: 7 },
+            { r: 0, c: 7 },
+            { r: 0, c: 6 },
+            { r: 0, c: 5 },
+            { r: 0, c: 4 },
+            { r: 1, c: 4 },
+            { r: 2, c: 4 },
+            { r: 3, c: 4 },
+            { r: 4, c: 4 },
+            { r: 4, c: 3 },
+            { r: 3, c: 3 },
+            { r: 2, c: 3 },
+            { r: 1, c: 3 },
+            { r: 0, c: 3 }
+          ],
+          pieces: [
+            { r: 6, c: 0, type: 'DEAD_END', rotation: 90 },
+            { r: 7, c: 0, type: 'CORNER', rotation: 90 },
+            { r: 7, c: 1, type: 'STRAIGHT', rotation: 0 },
+            { r: 7, c: 2, type: 'STRAIGHT', rotation: 0 },
+            { r: 7, c: 3, type: 'STRAIGHT', rotation: 0 },
+            { r: 7, c: 4, type: 'STRAIGHT', rotation: 0 },
+            { r: 7, c: 5, type: 'STRAIGHT', rotation: 0 },
+            { r: 7, c: 6, type: 'STRAIGHT', rotation: 0 },
+            { r: 7, c: 7, type: 'CORNER', rotation: 0 },
+            { r: 6, c: 7, type: 'STRAIGHT', rotation: 90 },
+            { r: 5, c: 7, type: 'STRAIGHT', rotation: 90 },
+            { r: 4, c: 7, type: 'STRAIGHT', rotation: 90 },
+            { r: 3, c: 7, type: 'STRAIGHT', rotation: 90 },
+            { r: 2, c: 7, type: 'STRAIGHT', rotation: 90 },
+            { r: 1, c: 7, type: 'STRAIGHT', rotation: 90 },
+            { r: 0, c: 7, type: 'CORNER', rotation: 270 },
+            { r: 0, c: 6, type: 'STRAIGHT', rotation: 0 },
+            { r: 0, c: 5, type: 'STRAIGHT', rotation: 0 },
+            { r: 0, c: 4, type: 'CORNER', rotation: 180 },
+            { r: 1, c: 4, type: 'STRAIGHT', rotation: 90 },
+            { r: 2, c: 4, type: 'STRAIGHT', rotation: 90 },
+            { r: 3, c: 4, type: 'STRAIGHT', rotation: 90 },
+            { r: 4, c: 4, type: 'CORNER', rotation: 0 },
+            { r: 4, c: 3, type: 'CORNER', rotation: 90 },
+            { r: 3, c: 3, type: 'STRAIGHT', rotation: 90 },
+            { r: 2, c: 3, type: 'STRAIGHT', rotation: 90 },
+            { r: 1, c: 3, type: 'STRAIGHT', rotation: 90 },
+            { r: 0, c: 3, type: 'ARROW_HEAD', rotation: 270, short: false }
+          ]
+        },
+        {
+          id: 'a2',
+          direction: 'RIGHT',
+          color: theme.color,
+          vertices: [
+            { r: 4, c: 1 },
+            { r: 3, c: 1 },
+            { r: 2, c: 1 },
+            { r: 2, c: 2 }
+          ],
+          pieces: [
+            { r: 4, c: 1, type: 'DEAD_END', rotation: 270 },
+            { r: 3, c: 1, type: 'STRAIGHT', rotation: 90 },
+            { r: 2, c: 1, type: 'CORNER', rotation: 180 },
+            { r: 2, c: 2, type: 'ARROW_HEAD', rotation: 0, short: false }
+          ]
+        },
+        {
+          id: 'a3',
+          direction: 'RIGHT',
+          color: theme.color,
+          vertices: [
+            { r: 1, c: 2 },
+            { r: 1, c: 1 },
+            { r: 0, c: 1 },
+            { r: 0, c: 0 },
+            { r: 1, c: 0 },
+            { r: 2, c: 0 },
+            { r: 3, c: 0 },
+            { r: 4, c: 0 },
+            { r: 5, c: 0 },
+            { r: 5, c: 1 },
+            { r: 6, c: 1 },
+            { r: 6, c: 2 },
+            { r: 6, c: 3 },
+            { r: 6, c: 4 },
+            { r: 6, c: 5 },
+            { r: 6, c: 6 }
+          ],
+          pieces: [
+            { r: 1, c: 2, type: 'DEAD_END', rotation: 180 },
+            { r: 1, c: 1, type: 'CORNER', rotation: 90 },
+            { r: 0, c: 1, type: 'CORNER', rotation: 270 },
+            { r: 0, c: 0, type: 'CORNER', rotation: 180 },
+            { r: 1, c: 0, type: 'STRAIGHT', rotation: 90 },
+            { r: 2, c: 0, type: 'STRAIGHT', rotation: 90 },
+            { r: 3, c: 0, type: 'STRAIGHT', rotation: 90 },
+            { r: 4, c: 0, type: 'STRAIGHT', rotation: 90 },
+            { r: 5, c: 0, type: 'CORNER', rotation: 90 },
+            { r: 5, c: 1, type: 'CORNER', rotation: 270 },
+            { r: 6, c: 1, type: 'CORNER', rotation: 90 },
+            { r: 6, c: 2, type: 'STRAIGHT', rotation: 0 },
+            { r: 6, c: 3, type: 'STRAIGHT', rotation: 0 },
+            { r: 6, c: 4, type: 'STRAIGHT', rotation: 0 },
+            { r: 6, c: 5, type: 'STRAIGHT', rotation: 0 },
+            { r: 6, c: 6, type: 'ARROW_HEAD', rotation: 0, short: false }
+          ]
+        },
+        {
+          id: 'a4',
+          direction: 'UP',
+          color: theme.color,
+          vertices: [
+            { r: 3, c: 2 },
+            { r: 4, c: 2 },
+            { r: 5, c: 2 },
+            { r: 5, c: 3 },
+            { r: 5, c: 4 },
+            { r: 5, c: 5 },
+            { r: 4, c: 5 },
+            { r: 3, c: 5 }
+          ],
+          pieces: [
+            { r: 3, c: 2, type: 'DEAD_END', rotation: 90 },
+            { r: 4, c: 2, type: 'STRAIGHT', rotation: 90 },
+            { r: 5, c: 2, type: 'CORNER', rotation: 90 },
+            { r: 5, c: 3, type: 'STRAIGHT', rotation: 0 },
+            { r: 5, c: 4, type: 'STRAIGHT', rotation: 0 },
+            { r: 5, c: 5, type: 'CORNER', rotation: 0 },
+            { r: 4, c: 5, type: 'STRAIGHT', rotation: 90 },
+            { r: 3, c: 5, type: 'ARROW_HEAD', rotation: 270, short: false }
+          ]
+        },
+        {
+          id: 'a5',
+          direction: 'RIGHT',
+          color: theme.color,
+          vertices: [
+            { r: 5, c: 6 },
+            { r: 4, c: 6 },
+            { r: 3, c: 6 },
+            { r: 2, c: 6 },
+            { r: 2, c: 5 },
+            { r: 1, c: 5 },
+            { r: 1, c: 6 }
+          ],
+          pieces: [
+            { r: 5, c: 6, type: 'DEAD_END', rotation: 270 },
+            { r: 4, c: 6, type: 'STRAIGHT', rotation: 90 },
+            { r: 3, c: 6, type: 'STRAIGHT', rotation: 90 },
+            { r: 2, c: 6, type: 'CORNER', rotation: 270 },
+            { r: 2, c: 5, type: 'CORNER', rotation: 90 },
+            { r: 1, c: 5, type: 'CORNER', rotation: 180 },
+            { r: 1, c: 6, type: 'ARROW_HEAD', rotation: 0, short: false }
+          ]
+        }
+      ]
     };
   }
 
