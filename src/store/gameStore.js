@@ -89,6 +89,23 @@ export const useGameStore = create(
         });
       },
 
+      // Play test a custom level directly from Level Editor
+      playCustomLevel: (customLevel) => {
+        const board = JSON.parse(JSON.stringify(customLevel));
+        const initialMaxLives = board.hearts || 3;
+        const initialTime = board.timer || board.timeLimit || null;
+        const initialHints = board.hints !== undefined ? board.hints : 3;
+
+        set({
+          currentBoard: board,
+          gameState: 'PLAYING',
+          lives: initialMaxLives,
+          maxLives: initialMaxLives,
+          timeRemaining: initialTime,
+          hintsRemaining: initialHints
+        });
+      },
+
       startGame: () => {
         const { gameType, timeArrowProgress, brainArrowProgress } = get();
         const progress = gameType === 'BRAIN_ARROW' ? brainArrowProgress : timeArrowProgress;

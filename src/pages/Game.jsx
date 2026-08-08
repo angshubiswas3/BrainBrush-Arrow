@@ -75,7 +75,7 @@ const Game = () => {
       <div className="game-stats-bar">
         <div className="stat-chip">
           <Navigation size={17} fill="#0f172a" strokeWidth={0} className="icon-flip" /> 
-          <span>{currentBoard.arrows?.length || 0}</span>
+          <span>{(currentBoard.arrows || currentBoard.board)?.length || 0}</span>
         </div>
 
         {/* Level Timer Pill (Shown only when level has timer configured) */}
